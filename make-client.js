@@ -47,13 +47,8 @@ const files = [
   "src/battleroom.js",
   "src/tournaments.js",
   "src/mod.js",
-  "src/vbattle.js",
-
   "src/arcon.js",
   "atlases/atlas.js",
-
-  "src/imgloader.js",
-  "src/vparts.js",
 ];
 
 // Read and concatenate the contents of all the files
