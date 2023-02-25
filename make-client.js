@@ -47,6 +47,7 @@ const files = [
   "src/battleroom.js",
   "src/tournaments.js",
   "src/mod.js",
+  "src/vbattle.js",
   "src/arcon.js",
   "atlases/atlas.js",
 ];

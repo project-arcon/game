@@ -342,9 +342,6 @@
       const random_ai = all_ais[Math.floor(Math.random() * all_ais.length)];
       ais.useAi(random_ai, "beta");
     }
-    setTimeout(() => {
-      network.send("switchSide", "spectators");
-    }, 1000);
     actionMixer.reset();
   };
 

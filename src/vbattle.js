@@ -126,7 +126,7 @@
   } catch (e) {}
 
   window.body = (e) => {
-    if (ui.mode === "battle" && sim.state === "running") {
+    if (ui.mode === "battle") {
       if (environment.timer_enabled) draw_timer();
       if (environment.tracker_enabled) draw_tracker();
       onecup.refresh();
