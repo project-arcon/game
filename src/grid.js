@@ -17,21 +17,24 @@
     return issue === null;
   };
 
-  window.hasIssue = function (player, spec) {
+  window.hasIssueUnit = function (player, unit) {
     var badParts, check, e, grid, hasPart, j, k, len, len1, part, ref, ref1, ref2, size, unit, w, x, y;
+    var issues = [];
     try {
-      unit = new types.Unit(spec);
       if (unit.parts.length === 0) {
-        return "No parts, drag parts from the left.";
+        issues.push("No parts, drag parts from the left.");
       }
       if (unit.cost > sim.costLimit + unit.limitBonus) {
-        return "Ship too big, cost can't be over $" + (sim.costLimit + unit.limitBonus) + ".";
+        issues.push("Ship too big, cost can't be over $" + (sim.costLimit + unit.limitBonus) + ".");
       }
       if (unit.parts.length > 800) {
-        return "Too many parts";
+        issues.push("Too many parts");
       }
       if (unit.name.length > 50) {
-        return "Name too long";
+        issues.push("Name too long");
+      }
+      if (unit.parts.length === 0) {
+        throw "cancelIssueCheck";
       }
       ref = unit.parts;
       for (j = 0, len = ref.length; j < len; j++) {
@@ -40,26 +43,26 @@
         x = part.pos[0] / SIZE + NxN / 2 - size[0] / 2;
         y = part.pos[1] / SIZE + NxN / 2 - size[1] / 2;
         if ((modulo(x, 1) > 0.0001 && modulo(x, 1) < 0.9999) || (modulo(y, 1) > 0.0001 && modulo(y, 1) < 0.9999)) {
-          return "Invalid part placement";
+          issues.push("Invalid part placement");
         }
         if (part.disable) {
-          return "Has parts that have been discontinued.";
+          issues.push("Has parts that have been discontinued.");
         }
         if (part.ghostCopy) {
-          return "Has parts from a copied ship.";
+          issues.push("Has parts from a copied ship.");
         }
         if (!part.dir < 0 || part.dir > 3 || modulo(part.dir, 1) !== 0) {
-          return "Invalid part rotation";
+          issues.push("Invalid part rotation");
         }
         if (!(part.dir === 0 || part.canRotate)) {
-          return "Part cannot rotate";
+          issues.push("Part cannot rotate");
         }
         if (!player.ai) {
           if (!(typeof account !== "undefined" && account !== null ? account.hasDLC(part.dlc) : void 0)) {
-            return "Please support us by getting " + part.dlc + " DLC and unlock " + part.name + ".";
+            issues.push("Please support us by getting " + part.dlc + " DLC and unlock " + part.name + ".");
           }
           if (!(typeof account !== "undefined" && account !== null ? account.hasDLCBonus() : void 0) && part.dir && part.dir !== 0) {
-            return "Part rotation is currently only available to <a href='http://store.steampowered.com/app/472490' target='_blank'>supporters who get a DLC</a>.";
+            issues.push("Part rotation is currently only available to <a href='http://store.steampowered.com/app/472490' target='_blank'>supporters who get a DLC</a>.");
           }
         }
       }
@@ -76,7 +79,7 @@
       };
       (ref1 = computeGrid(player, unit)), (grid = ref1[0]), (badParts = ref1[1]);
       if (badParts.length > 0) {
-        return "Ship has parts outside the build area.";
+        issues.push("Ship has parts outside the build area.");
       }
       check = function (fn) {
         var k, l, ref2, ref3, t;
@@ -96,7 +99,7 @@
             return t.locked;
           })
         ) {
-          return "Has parts that have not been unlocked.";
+          issues.push("Has parts that have not been unlocked.");
         }
       }
       if (
@@ -104,86 +107,95 @@
           return t.overlap;
         })
       ) {
-        return "Parts should not overlap.";
+        issues.push("Parts should not overlap.");
       }
       if (
         check(function (t) {
           return t.exhaust && t.solid;
         })
       ) {
-        return "Engine exhaust must not hit another part.";
+        issues.push("Engine exhaust must not hit another part.");
       }
       if (
         check(function (t) {
           return t.solid && !t.fill;
         })
       ) {
-        return "All ship parts must be connected.";
+        issues.push("All ship parts must be connected.");
       }
       if (
         check(function (t) {
           return t.bad && t.gimble;
         })
       ) {
-        return "Weapons must be placed on a mount.";
+        issues.push("Weapons must be placed on a mount.");
       }
       if (
         check(function (t) {
           return t.noTurret;
         })
       ) {
-        return "Mount has no turret attached.";
+        issues.push("Mount has no turret attached.");
       }
       if (
         check(function (t) {
           return t.noEffect;
         })
       ) {
-        return "Part needs to be next to a weapon.";
+        issues.push("Part needs to be next to a weapon.");
       }
       if (
         check(function (t) {
           return t.cantPaint;
         })
       ) {
-        return "Decal can't be placed like this. Decals go on armor or batteries.";
+        issues.push("Decal can't be placed like this. Decals go on armor or batteries.");
       }
       if (
         check(function (t) {
           return t.overPaint;
         })
       ) {
-        return "Decal overlaps with another decal.";
+        issues.push("Decal overlaps with another decal.");
       }
       if (
         check(function (t) {
-          return t.bad;
+          return t.bad && !t.overlap && !(t.exhaust && t.solid) && !(t.solid && !t.fill) && !t.gimble && !t.noTurret && !t.noEffect && t.cantPaint && t.overPaint;
         })
       ) {
-        return "Improperly placed part.";
+        issues.push("Improperly placed part.");
       }
       if (unit.storeEnergy === 0) {
-        return "No energy storage, add battery or reactor.";
+        issues.push("No energy storage, add battery or reactor.");
       }
       if (unit.maxSpeed === 0) {
-        return "Can't move, add engines.";
+        issues.push("Can't move, add engines.");
       }
       if (unit.jumpDistance > 0 && unit.jumpDistance < unit.minJump) {
-        return "Insufficient jump power for mass. Add more jump drives.";
+        issues.push("Insufficient jump power for mass. Add more jump drives.");
       }
       ref2 = unit.weapons;
       for (k = 0, len1 = ref2.length; k < len1; k++) {
         w = ref2[k];
         if (w.minRange > w.range) {
-          return "Minimum range exceeds weapon range.";
+          issues.push("Minimum range exceeds weapon range.");
         }
       }
-      return null;
     } catch (error) {
-      e = error;
-      console.log("exception e", e);
-      return "Part parse error... thats odd?";
+      if (error !== "cancelIssueCheck") {
+        e = error;
+        console.log("exception e", e);
+        issues.push("Part parse error... thats odd?");
+      }
     }
+    if (issues.length > 0) {
+      return Array.from(new Set(issues)).join("<br>");
+    }
+    return null;
+  };
+
+  window.hasIssue = function (player, spec) {
+    return hasIssueUnit(player, new types.Unit(spec));
   };
 
   window.genBuildPic = function (spec) {};

@@ -1459,6 +1459,7 @@
       this.shotEnergy *= this.weaponEnergy;
       this.reloadTime = Math.ceil(this.reloadTime);
       this.fireEnergy = this.shotEnergy / this.reloadTime;
+      this.projectileSpeed = this.weaponRange / this.weaponSpeed;
       return (this.dps = this.damage / this.reloadTime);
     };
 

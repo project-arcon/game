@@ -7,8 +7,7 @@
 
   ui.menu = function () {
     ui.menuFrame("mainmenu", function () {
-      menuButtons();
-      return ui.dlcs();
+      return menuButtons();
     });
     return ui.quickOptions();
   };
@@ -110,10 +109,7 @@
           });
         });
       };
-      siteLink("blog", "https://medium.com/@treeform");
-      siteLink("reddit", "http://reddit.com/r/istrolid/");
-      siteLink("discord", "https://discord.gg/stX3pmF");
-      return siteLink("twitter", "https://twitter.com/treeform");
+      return siteLink("discord", "https://discord.gg/JmRE2yRkXm");
     });
   };
 
@@ -155,27 +151,6 @@
           return left(m - 330 / 2);
         }
       );
-      div(function () {
-        position("absolute");
-        top(0);
-        width("100%");
-        height(200);
-        overflow("hidden");
-        return div(function () {
-          position("absolute");
-          top(30);
-          right(-50);
-          padding("6px 0px");
-          font_size(18);
-          font_weight("bold");
-          text_align("center");
-          text("1." + VERSION + "." + MINOR_VERSION);
-          color("white");
-          background("black");
-          width(200);
-          return transform("rotate(45deg)");
-        });
-      });
       return fn();
     });
   };
@@ -327,57 +302,4 @@
   css(".hover-bright:hover", function () {
     return filter("saturate(160%)");
   });
-
-  ui.dlcs = function () {
-    var drawDlc;
-    drawDlc = function (name, image, url, fn) {
-      return div(function () {
-        fn();
-        overflow("hidden");
-        img(
-          ".hover-bright",
-          {
-            src: image,
-            width: 260,
-            height: 100,
-          },
-          function () {
-            return onclick(function () {
-              return open(url, "_blank");
-            });
-          }
-        );
-        if (typeof internal !== "undefined" && internal !== null ? internal.DLCs[name] : void 0) {
-          return div(function () {
-            position("absolute");
-            top(30);
-            right(-48);
-            padding(5);
-            font_size(20);
-            font_weight("bold");
-            text_align("center");
-            color("white");
-            background("rgba(200,0,0,1)");
-            width(200);
-            transform("rotate(45deg)");
-            return text("THANKS!");
-          });
-        }
-      });
-    };
-    drawDlc("Paint Job", "img/ui/dlc/dlc1.png", "steam://store/472490", function () {
-      position("absolute");
-      top(465);
-      left(25);
-      width(260);
-      return height(100);
-    });
-    return drawDlc("Curves and Shadows", "img/ui/dlc/dlc2.png", "steam://store/614180", function () {
-      position("absolute");
-      top(465);
-      right(25);
-      width(260);
-      return height(100);
-    });
-  };
 }.call(this));
