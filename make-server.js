@@ -3,11 +3,12 @@ const path = require("path");
 
 // List of all the files to concatenate
 const files = [
-  "./src/mtwist.js",
+  "./lib/mtwist.js",
   "./src/maths.js",
   "./src/hspace.js",
   "./src/zjson.js",
   "./src/protocol.js",
+  "./src/transloader.js",
   "./src/trans.js",
   "./src/mxserver.js",
   "./src/utils.js",
@@ -15,7 +16,6 @@ const files = [
   "./src/maps.js",
   "./src/sim.js",
   "./src/survival.js",
-  //"./src/interpolator.js",
   "./src/things.js",
   "./src/unit.js",
   "./src/parts.js",
