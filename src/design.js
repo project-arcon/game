@@ -557,6 +557,15 @@
         baseAtlas.drawSprite("parts/red-" + part.prototype.image, [0, 0], [-1, 1], 0, commander.color);
       } else if (part.prototype.decal) {
         baseAtlas.drawSprite("parts/" + part.prototype.image, [0, 0], [-1, 1], 0, commander.color);
+      } else if (part.prototype.vblock) {
+        vscale = part.prototype.vscale;
+        baseAtlas.drawSprite("vparts/" + part.prototype.image, [0, 0], [-vscale, vscale], 0, white);
+      } else if (part.prototype.vturret) {
+        vscale = part.prototype.vscale;
+        vimage = part.prototype.image;
+        if (part.prototype.has_ready) vimage = part.prototype.image.replace("reload.png", "ready.png");
+        baseAtlas.drawSprite("vparts/" + vimage, [0, 0], [-vscale, vscale], 0, white);
+        baseAtlas.drawSprite("vparts/" + part.prototype.image.replace("reload.png", "bloom.png"), [0, 0], [-vscale, vscale], 0, commander.color);
       } else {
         baseAtlas.drawSprite("parts/" + part.prototype.image, [0, 0], [-1, 1], 0, white);
       }
