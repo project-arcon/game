@@ -1238,62 +1238,60 @@
       }
       return results;
     };
-    if (player.ai) {
-      ref1 = player.aiRules;
-      for (number = l = 0, len1 = ref1.length; l < len1; number = ++l) {
-        rules = ref1[number];
-        for (m = 0, len2 = rules.length; m < len2; m++) {
-          rule = rules[m];
-          if (ais.isInvalidRule(rule)) {
-            continue;
-          }
-          switch (rule[0].toLowerCase()) {
-            case "field # at priority #":
+    ref1 = player.aiRules;
+    for (number = l = 0, len1 = ref1.length; l < len1; number = ++l) {
+      rules = ref1[number];
+      for (m = 0, len2 = rules.length; m < len2; m++) {
+        rule = rules[m];
+        if (ais.isInvalidRule(rule)) {
+          continue;
+        }
+        switch (rule[0].toLowerCase()) {
+          case "field # at priority #":
+            need = rule[1] - countsFielded[number];
+            if (need > 0) {
+              priorityBuild(need, rule[2], number);
+            }
+            break;
+          case "field # for # of enemy * at priority #":
+            ratio = rule[1] / rule[2];
+            enemyHave = enemysFielded[rule[3]] || 0;
+            need = Math.floor(enemyHave * ratio) - countsFielded[number];
+            if (need > 0) {
+              priorityBuild(need, rule[4], number);
+            }
+            break;
+          case "field # for # of ship in slot # at priority #":
+            ratio = rule[1] / rule[2];
+            otherSlot = parseInt(rule[3]) - 1;
+            need = Math.floor(countsFielded[otherSlot] * ratio) - countsFielded[number];
+            if (need > 0) {
+              priorityBuild(need, rule[4], number);
+            }
+            break;
+          case "try to field # every # seconds":
+            if (sim.step !== 0 && sim.step % (rule[2] * 16) === 0) {
+              need = rule[1];
+              priorityBuild(need, 0, number);
+            }
+            break;
+          case "field # at start":
+            if (sim.step < 16 * 5) {
               need = rule[1] - countsFielded[number];
-              if (need > 0) {
-                priorityBuild(need, rule[2], number);
-              }
-              break;
-            case "field # for # of enemy * at priority #":
-              ratio = rule[1] / rule[2];
-              enemyHave = enemysFielded[rule[3]] || 0;
-              need = Math.floor(enemyHave * ratio) - countsFielded[number];
-              if (need > 0) {
-                priorityBuild(need, rule[4], number);
-              }
-              break;
-            case "field # for # of ship in slot # at priority #":
-              ratio = rule[1] / rule[2];
-              otherSlot = parseInt(rule[3]) - 1;
-              need = Math.floor(countsFielded[otherSlot] * ratio) - countsFielded[number];
-              if (need > 0) {
-                priorityBuild(need, rule[4], number);
-              }
-              break;
-            case "try to field # every # seconds":
-              if (sim.step !== 0 && sim.step % (rule[2] * 16) === 0) {
-                need = rule[1];
-                priorityBuild(need, 0, number);
-              }
-              break;
-            case "field # at start":
-              if (sim.step < 16 * 5) {
-                need = rule[1] - countsFielded[number];
-                priorityBuild(need, 0, number);
-              }
-              break;
-            case "field # for # of @needtypes at priority #":
-              ratio = (rule[1] / rule[2]) * counterNeed(rule[3], player);
-              need = Math.floor(ratio - countsFielded[number]);
-              if (need > 0) {
-                priorityBuild(need, rule[4], number);
-              }
-              break;
-            case "field # when money over # at priority #":
-              if (player.money > rule[2]) {
-                priorityBuild(rule[1], rule[3], number);
-              }
-          }
+              priorityBuild(need, 0, number);
+            }
+            break;
+          case "field # for # of @needtypes at priority #":
+            ratio = (rule[1] / rule[2]) * counterNeed(rule[3], player);
+            need = Math.floor(ratio - countsFielded[number]);
+            if (need > 0) {
+              priorityBuild(need, rule[4], number);
+            }
+            break;
+          case "field # when money over # at priority #":
+            if (player.money > rule[2]) {
+              priorityBuild(rule[1], rule[3], number);
+            }
         }
       }
     }
