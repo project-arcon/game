@@ -51,6 +51,7 @@ const files = [
   "./src/tournaments.js",
   "./src/mod.js",
   "./src/vbattle.js",
+  "./src/vparts.js",
   "./src/arcon.js",
   "./atlases/atlas.js",
 ];
@@ -63,7 +64,7 @@ const contents = files.reduce((acc, file) => {
 }, "");
 
 // Write the concatenated contents to the output file in the public/js directory
-const outputFilePath = path.join(__dirname, "arcon.js");
+const outputFilePath = path.join(__dirname, "../website/public/js/arcon.js");
 fs.writeFileSync(outputFilePath, contents, "utf-8");
 
 console.log("Successfully created arcon.js");
