@@ -1136,7 +1136,7 @@
         }
       }
       this.timeEnd("death");
-      this.timeStart("tick");
+      this.timeStart("thingTick");
       ref1 = this.things;
       for (id in ref1) {
         thing = ref1[id];
@@ -1144,16 +1144,26 @@
           thing.tick();
         }
       }
-      this.timeEnd("tick");
+      this.timeEnd("thingTick");
       this.timeStart("move");
       ref2 = this.things;
       for (id in ref2) {
         thing = ref2[id];
         if (typeof thing.move === "function") {
           thing.move();
+          thing.forcedOneJump = false;
         }
       }
       this.timeEnd("move");
+      this.timeStart("thingPostTick");
+      ref1 = this.things;
+      for (id in ref1) {
+        thing = ref1[id];
+        if (/*!thing.frozen && */ typeof thing.postTick === "function") {
+          thing.postTick();
+        }
+      }
+      this.timeEnd("thingPostTick");
       this.timeIt(
         "unitsCollide",
         (function (_this) {
@@ -1163,6 +1173,7 @@
         })(this)
       );
       if (this.state === "running" || this.serverType === "sandbox") {
+        this.timeStart("playersTick");
         ref3 = this.players;
         for (l = 0, len1 = ref3.length; l < len1; l++) {
           player = ref3[l];
@@ -1170,7 +1181,9 @@
             player.tick();
           }
         }
+        this.timeEnd("playersTick");
       }
+
       ref4 = this.players;
       for (m = 0, len2 = ref4.length; m < len2; m++) {
         player = ref4[m];
@@ -1181,20 +1194,25 @@
           player.side = "spectators";
         }
       }
-      if (this.serverType === "survival") {
-        survival.simulate(this);
-        survival.victoryConditions(this);
-      } else {
-        this.victoryConditions();
-        if (typeof this.extra === "function") {
-          this.extra();
-        }
-        if ((ref5 = this.galaxyStar) != null) {
-          if (typeof ref5.tick === "function") {
-            ref5.tick();
+      this.timeStart("serverTypeSpecial");
+      switch (this.serverType) {
+        case "survival":
+          survival.simulate(this);
+          survival.victoryConditions(this);
+          break;
+        default:
+          this.victoryConditions();
+          if (typeof this.extra === "function") {
+            this.extra();
           }
-        }
+          if ((ref5 = this.galaxyStar) != null) {
+            if (typeof ref5.tick === "function") {
+              ref5.tick();
+            }
+          }
+          break;
       }
+      this.timeEnd("serverTypeSpecial");
 
       stillThere = false;
       hasAIplayer = false;
@@ -1233,7 +1251,7 @@
     };
 
     Sim.prototype.spacesRebuild = function () {
-      var _, ref, results, t;
+      var _, ref, t;
       this.unitSpaces = {
         alpha: new HSpace(500),
         beta: new HSpace(500),
@@ -1243,7 +1261,6 @@
         beta: new HSpace(100),
       };
       ref = this.things;
-      results = [];
       for (_ in ref) {
         t = ref[_];
         if (t.dead) {
@@ -1253,12 +1270,9 @@
           this.unitSpaces[t.side].insert(t);
         }
         if (t.bullet) {
-          results.push(this.bulletSpaces[t.side].insert(t));
-        } else {
-          results.push(void 0);
+          this.bulletSpaces[t.side].insert(t);
         }
       }
-      return results;
     };
 
     Sim.prototype.victoryConditions = function () {
@@ -1352,8 +1366,10 @@
           }
         }
       }
-      if (this.serverType === "survival") {
-        survival.endOfGame(this);
+      switch (this.serverType) {
+        case "survival":
+          survival.endOfGame(this);
+          break;
       }
       this.state = "ended";
     };

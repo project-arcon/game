@@ -149,7 +149,8 @@
     }
 
     Unit.prototype.fromSpec = function (spec) {
-      var data, i, j, l, len, len1, len2, len3, len4, n, o, p, part, partNum, q, reachRange, ref, ref1, ref2, ref3, ref4, results, stasisRange, thrust, w;
+      var data, i, j, l, len, len1, len2, len3, len4, n, o, p, part, partNum, q, reachRange, ref, ref1, ref2, ref3, ref4, results, stasisRange, thrust, w, hasCloak;
+      hasCloak = false;
       this.cost = 0;
       this.hp = 5;
       this.jumpDistance = 0;
@@ -219,15 +220,21 @@
             this.maxRange = stasisRange;
           }
         }
+        if (!hasCloak && p.type === "CloakGenerator") {
+          hasCloak = true;
+        }
       }
       this.maxHP = this.hp;
       this.energy = this.storeEnergy;
       this.turnSpeed = this.turnSpeed / this.mass;
-      this.maxSpeed = (thrust / this.mass) * 9;
+      this.maxSpeed = thrust !== 0 ? (thrust / this.mass) * 9 : 0;
       this.maxShield = this.shield;
       this.damageRatio = 1;
-      this.jumpDistance = this.jump = Math.min(1, (41 * this.jumpCount) / this.mass) * 600;
+      this.jumpDistance = this.jump = this.jumpCount !== 0 ? Math.min(1, (41 * this.jumpCount) / this.mass) * 600 : 0;
       this.computeCenter();
+      if (hasCloak) {
+        this.cloak = this.mass;
+      }
       ref1 = this.parts;
       for (l = 0, len1 = ref1.length; l < len1; l++) {
         part = ref1[l];
@@ -343,6 +350,54 @@
       }
     };
 
+    var partOccupiedGrid = function (part) {
+      var xsize, ysize;
+      var result = [];
+      if (part.dir % 2 === 0) {
+        xsize = part.size[0];
+        ysize = part.size[1];
+      } else {
+        xsize = part.size[1];
+        ysize = part.size[0];
+      }
+      var basex = part.pos[0] - ((xsize - 1) / 2) * 20;
+      var basey = part.pos[1] - ((ysize - 1) / 2) * 20;
+      for (var x = 0; x < xsize; x++) {
+        for (var y = 0; y < ysize; y++) {
+          result.push([basex + x * 20, basey + y * 20]);
+        }
+      }
+      return result;
+    };
+
+    var partCorners = function (part) {
+      var xsize, ysize;
+      var result = [];
+      if (part.dir % 2 === 0) {
+        xsize = part.size[0];
+        ysize = part.size[1];
+      } else {
+        xsize = part.size[1];
+        ysize = part.size[0];
+      }
+      var xmin = part.pos[0] - ((xsize - 1) / 2) * 20;
+      var ymin = part.pos[1] - ((ysize - 1) / 2) * 20;
+      var xmax = xmin + (xsize - 1) * 20;
+      var ymax = ymin + (ysize - 1) * 20;
+
+      result.push([xmin, ymin]);
+      if (xmin !== xmax) {
+        result.push([xmax, ymin]);
+      }
+      if (ymin !== ymax) {
+        result.push([xmin, ymax]);
+      }
+      if (xmin !== xmax && ymin !== ymax) {
+        result.push([xmax, ymax]);
+      }
+
+      return result;
+    };
     Unit.prototype.computeRadius = function () {
       var j, len, part, radius, ref, v;
       v = v2.create();
@@ -352,15 +407,16 @@
         if (!!part.decal) {
           continue;
         }
-        v2.set(part.pos, v);
-        v2.sub(v, this.center);
-        radius = v2.mag(v);
-        if (radius > this.radius) {
-          this.radius = radius;
+        var grids = partCorners(part);
+        for (let i = 0; i < grids.length; i++) {
+          const pos = grids[i];
+          v2.set(pos, v);
+          v2.sub(v, this.center);
+          radius = v2.mag(v);
+          if (radius > this.radius) {
+            this.radius = radius;
+          }
         }
-      }
-      if (this.radius > 500) {
-        return (this.radius = 500);
       }
     };
 
@@ -368,7 +424,7 @@
       this.shield -= d;
       if (this.shield < 0) {
         this.hp += this.shield;
-        return (this.shield = 0);
+        this.shield = 0;
       }
     };
 
@@ -447,6 +503,10 @@
       return this.cloakFade > 0;
     };
 
+    Unit.prototype.shouldDie = function () {
+      return this.requiredDead || (!this.frozen && (this.warheadExplode || (this.hp <= 0)));
+    };
+
     Unit.prototype.tick = function () {
       var burnTick, cloakOn, cloakRange, exp, j, l, len, len1, len2, n, part, ref, ref1, ref2, ref3, sound, speed, target;
       ref = this.parts;
@@ -469,9 +529,12 @@
         if (speed > 1) {
           this.cloak -= (0.2 / 16) * this.mass;
         }
+        this.cloak -= (0.01 / 16) * this.mass;
+        /*
         if (sim.step % 16 === 0) {
           this.cloak -= 0.01 * this.mass;
         }
+        */
         cloakOn = this.mass * 0.5;
         if (this.cloak > cloakOn) {
           cloakRange = this.mass - cloakOn;
@@ -501,11 +564,14 @@
           this.energy += part.genEnergy;
         }
       }
+
+      sim.timeStart("parts");
       ref2 = this.parts;
       for (n = 0, len2 = ref2.length; n < len2; n++) {
         part = ref2[n];
         part.tick();
       }
+      sim.timeEnd("parts");
       if (this.energy > this.storeEnergy) {
         this.energy = this.storeEnergy;
       }
@@ -515,19 +581,51 @@
       if ((ref3 = this.target) != null ? ref3.dead : void 0) {
         this.target = null;
       }
-      if (sim.step % 16 === 0) {
-        if (this.burn > 4) {
-          if (this.hp < 4) {
-            this.burn = 0;
-          }
-          burnTick = this.burn * 0.04;
-          this.applyDamage(burnTick);
-          this.burn -= burnTick;
-        } else {
-          this.burn = 0;
+      //if (sim.step % 16 === 0) {
+      if (this.burn > 4) {
+        //if (this.hp < 4) {
+        //  this.burn = 0;
+        //}
+        burnTick = sim.flags["instant_burn"] ? this.burn : (this.burn * 0.04) / 16;
+        this.applyDamage(Math.max(0, Math.min(burnTick, this.shield + this.hp - 4)));
+        this.burn -= burnTick;
+      } else {
+        this.burn = 0;
+      }
+      //}
+      if (sim.flags["stasis_field_hazard"]) {
+        this.jump -= 30;
+        if (this.jump < 0) {
+          this.jump = 0;
+        }
+        this.cloak -= 20;
+        if (this.cloak < 0) {
+          this.cloak = 0;
+        }
+        if (v2.mag(this.vel) > parts.StasisField.prototype.maxSlow) {
+          v2.scale(this.vel, 0.85);
+        }
+        this.slowed = true;
+      }
+      if (this.shouldDie()) {
+        this.kill();
+      }
+    };
+
+    Unit.prototype.postTick = function () {
+      sim.timeStart("parts");
+      ref2 = this.parts;
+      for (n = 0, len2 = ref2.length; n < len2; n++) {
+        part = ref2[n];
+        if (typeof part.postTick === "function") {
+          part.postTick();
         }
       }
-      if (this.hp <= 0) {
+      sim.timeEnd("parts");
+    };
+
+    Unit.prototype.kill = function () {
+      if (!this.vanishDestroyMode && !this.superSpecial) {
         sound = this.maxHP < 100 ? "sounds/weapons/explode1.wav" : this.maxHP < 600 ? "sounds/weapons/explode3.wav" : "sounds/weapons/explode4.wav";
         exp = new types.ShipExplosion(sound);
         exp.z = 1000;
@@ -536,10 +634,10 @@
         exp.rot = 0;
         exp.radius = Math.max(this.mass / 5, 50);
         sim.things[exp.id] = exp;
-        this.dead = true;
-        if (this.building) {
-          return (this.building.dead = true);
-        }
+      }
+      this.dead = true;
+      if (this.building) {
+        return (this.building.dead = true);
       }
     };
 
@@ -1160,7 +1258,8 @@
     };
 
     Unit.prototype.selfDestruct = function () {
-      return (this.hp = 0);
+      this.requiredDead = true;
+      //return this.hp = 0;
     };
 
     Unit.prototype.toggleHoldPosition = function () {
@@ -1190,16 +1289,19 @@
         }
         return true;
       }
-      if (this.jump >= this.minJump && !this.holdPosition) {
+      if ((this.jump >= this.minJump || this.forcedOneJump) && !this.holdPosition) {
         jumpDist = Math.min(this.jumpDistance, this.jump);
-        if (v2.distance(this.pos, pos) < jumpDist) {
-          this.cloak -= 0.25 * this.mass;
+        if (v2.distance(this.pos, pos) < jumpDist || this.forcedOneJump) {
+          this.cloak = Math.max(0, this.cloak - 0.25 * this.mass);
           jumpVec = v2.create();
           v2.sub(pos, this.pos, jumpVec);
           v2.add(this.pos, jumpVec);
           v2.zero(this.vel);
           this.warpIn = 0;
-          this.jump = 0;
+          this.jumped = true;
+          if (!this.forcedOneJump) {
+            this.jump = 0;
+          }
           this.rot = v2.angle(jumpVec);
           return false;
         }
@@ -1363,6 +1465,59 @@
 
   _vel = [0, 0];
 
+  window.weaponAim = function (worldPos, range, bulletSpeed, instant, thing) {
+    var c, check, current_time, d, do_pos, j, max_time, mdown, miss, mup, p, predicted_pos, th;
+    if (instant) {
+      p = thing.pos;
+      predicted_pos = [p[0] - worldPos[0], p[1] - worldPos[1]];
+      th = v2.angle(predicted_pos);
+      return [th, v2.mag(predicted_pos) - thing.radius];
+    }
+    do_pos = (function () {
+      return function (t) {
+        var v;
+        p = thing.pos;
+        v = thing.vel;
+        return [p[0] - worldPos[0] + v[0] * t, p[1] - worldPos[1] + v[1] * t];
+      };
+    })();
+    check = (function () {
+      return function (t) {
+        var miss, predicted_range;
+        predicted_pos = do_pos(t);
+        predicted_range = v2.mag(predicted_pos) - thing.radius;
+        miss = Math.abs(predicted_range - bulletSpeed * t);
+        return miss;
+      };
+    })();
+    max_time = range / bulletSpeed;
+    current_time = 0;
+    d = 2;
+    miss = check(current_time);
+    for (c = j = 0; j < 32; c = ++j) {
+      mdown = check(current_time - max_time / d);
+      mup = check(current_time + max_time / d);
+      if (mdown < miss && mdown < mup) {
+        current_time -= max_time / d;
+        miss = mdown;
+      }
+      if (mup < miss && mup < mdown) {
+        current_time += max_time / d;
+        miss = mup;
+      }
+      if (miss < 1) {
+        break;
+      }
+      d *= 2;
+    }
+    if (current_time < 0) {
+      current_time = 0;
+    }
+    predicted_pos = do_pos(current_time);
+    th = v2.angle(predicted_pos);
+    return [th, v2.mag(predicted_pos) - thing.radius];
+  };
+
   window.Turret = (function (superClass) {
     extend(Turret, superClass);
 
@@ -1481,11 +1636,17 @@
       }
       if (this.unit.target !== null && this.canShoot(this.unit.target)) {
         this.target = this.unit.target;
-        return this.fire();
+        this.fire();
       } else if (this.target !== null && this.canShoot(this.target)) {
-        return this.fire();
+        this.fire();
       } else {
-        return this.findTarget();
+        this.findTarget();
+        if (this.unit.target !== null && this.canShoot(this.unit.target)) {
+          this.target = this.unit.target;
+          this.fire();
+        } else if (this.target !== null && this.canShoot(this.target)) {
+          this.fire();
+        }
       }
     };
 
@@ -1525,56 +1686,7 @@
     };
 
     Turret.prototype.aim = function (thing) {
-      var c, check, current_time, d, do_pos, j, max_time, mdown, miss, mup, p, predicted_pos, th;
-      if (this.instant) {
-        p = thing.pos;
-        predicted_pos = [p[0] - this.worldPos[0], p[1] - this.worldPos[1]];
-        th = v2.angle(predicted_pos);
-        return [th, v2.mag(predicted_pos) - thing.radius];
-      }
-      do_pos = (function (_this) {
-        return function (t) {
-          var v;
-          p = thing.pos;
-          v = thing.vel;
-          return [p[0] - _this.worldPos[0] + v[0] * t, p[1] - _this.worldPos[1] + v[1] * t];
-        };
-      })(this);
-      check = (function (_this) {
-        return function (t) {
-          var miss, predicted_range;
-          predicted_pos = do_pos(t);
-          predicted_range = v2.mag(predicted_pos) - thing.radius;
-          miss = Math.abs(predicted_range - _this.bulletSpeed * t);
-          return miss;
-        };
-      })(this);
-      max_time = this.range / this.bulletSpeed;
-      current_time = 0;
-      d = 2;
-      miss = check(current_time);
-      for (c = j = 0; j < 32; c = ++j) {
-        mdown = check(current_time - max_time / d);
-        mup = check(current_time + max_time / d);
-        if (mdown < miss && mdown < mup) {
-          current_time -= max_time / d;
-          miss = mdown;
-        }
-        if (mup < miss && mup < mdown) {
-          current_time += max_time / d;
-          miss = mup;
-        }
-        if (miss < 1) {
-          break;
-        }
-        d *= 2;
-      }
-      if (current_time < 0) {
-        current_time = 0;
-      }
-      predicted_pos = do_pos(current_time);
-      th = v2.angle(predicted_pos);
-      return [th, v2.mag(predicted_pos) - thing.radius];
+      return weaponAim(this.worldPos, this.range, this.bulletSpeed, this.instant, thing);
     };
 
     Turret.prototype.canShoot = function (other) {
@@ -1582,7 +1694,7 @@
       if (!other.unit && !(other.missile && this.hitsMissiles)) {
         return false;
       }
-      if (this.instant && other.unit && other.hp <= 0) {
+      if (this.instant && other.unit && other.shouldDie()) {
         return false;
       }
       if (this.instant && this.hitsMissiles && other.missile && other.life >= other.maxLife) {
@@ -1600,7 +1712,7 @@
       if (other.missile && other.explode === false) {
         return false;
       }
-      if (other.cloak > 0 && other.cloaked()) {
+      if (!this.engageCloak && other.cloak > 0 && other.cloaked()) {
         return false;
       }
       distance = v2.distance(this.worldPos, other.pos);
@@ -1617,7 +1729,7 @@
         return false;
       }
       arcAngle = angleBetween(this.unit.rot, th);
-      if ((Math.abs(arcAngle) / Math.PI) * 180 > this.arc / 2) {
+      if (!((Math.abs(arcAngle) / Math.PI) * 180 <= this.arc / 2)) {
         return false;
       }
       if (this.noOverkill) {
@@ -2063,8 +2175,9 @@
   };
 
   window.specCost = function (spec) {
-    var cost, j, len, part, partCls, ref;
+    var cost, limitBonus, j, len, part, partCls, ref;
     cost = 0;
+    limitBonus = 0;
     if (!Array.isArray(spec)) {
       spec = fromShort(spec);
     }
@@ -2073,9 +2186,10 @@
       part = ref[j];
       partCls = window.parts[part.type];
       if (partCls) {
-        cost += partCls.prototype.cost;
+        cost += partCls.prototype.cost ?? 0;
+        limitBonus += partCls.prototype.limitBonus ?? 0;
       }
     }
-    return cost;
+    return true ? cost : Math.ceil(cost <= sim.costLimit + limitBonus ? cost : cost * (0.5 + (0.5 * cost) / (sim.costLimit + limitBonus)));
   };
 }.call(this));

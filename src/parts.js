@@ -2139,45 +2139,58 @@
 
     EnergyTransfer.prototype.trasferEnergy = 60;
 
+    EnergyTransfer.prototype.worked = 0;
+
+    EnergyTransfer.prototype.rate = 1; //16;
+
     EnergyTransfer.prototype.init = function () {
+      this.unit.energyCasterPower = (this.unit.energyCasterPower || 0) + 1;
       return (this.unit.energyCaster = true);
     };
 
-    EnergyTransfer.prototype.tick = function () {
-      var amount, distance, giveTo, i, j, len, len1, ref, ref1, results, thing;
-      if ((sim.step + this.unit.id) % 16 === 0 && this.unit.energy > 100) {
-        this.working = false;
-        giveTo = [];
-        ref = this.unit.closestFriends();
-        for (i = 0, len = ref.length; i < len; i++) {
-          thing = ref[i];
-          if (thing.energy < thing.storeEnergy && thing.energy > -1) {
-            if (thing.energyCaster && thing.energy / thing.storeEnergy > this.unit.energy / this.unit.storeEnergy) {
-              continue;
+    EnergyTransfer.prototype.tick = function () {};
+
+    EnergyTransfer.prototype.postTick = function () {
+      sim.timeStart("EnergyTransfer");
+      this.worked = Math.max(this.worked - 1, 0);
+      var amount, distance, giveTo, i, j, len, len1, ref, ref1, thing;
+      if ((sim.step + this.unit.id) % this.rate === 0) {
+        if (this.unit.energy > (100 * this.rate) / 16) {
+          giveTo = [];
+          ref = this.unit.closestFriends();
+          for (i = 0, len = ref.length; i < len; i++) {
+            thing = ref[i];
+            if (thing.energy < thing.storeEnergy && thing.energy > -1) {
+              if (thing.energyCaster && thing.energy / thing.storeEnergy > this.unit.energy / this.unit.storeEnergy) {
+                continue;
+              }
+              distance = v2.distance(this.unit.pos, thing.pos);
+              if (distance < this.range) {
+                giveTo.push(thing);
+              }
             }
-            distance = v2.distance(this.unit.pos, thing.pos);
-            if (distance < this.range) {
-              giveTo.push(thing);
+          }
+          ref1 = shuffle(giveTo);
+          results = [];
+          for (j = 0, len1 = ref1.length; j < len1; j++) {
+            thing = ref1[j];
+            amount = thing.storeEnergy - thing.energy;
+            var limit = this.trasferEnergy * this.rate;
+            if (amount > limit) {
+              amount = limit;
             }
+            if (amount > this.unit.energy) {
+              amount = this.unit.energy;
+            }
+            thing.energy += amount;
+            this.unit.energy -= amount;
+            this.worked = 16;
           }
         }
-        ref1 = shuffle(giveTo);
-        results = [];
-        for (j = 0, len1 = ref1.length; j < len1; j++) {
-          thing = ref1[j];
-          amount = thing.storeEnergy - thing.energy;
-          if (amount > this.trasferEnergy * 16) {
-            amount = this.trasferEnergy * 16;
-          }
-          if (amount > this.unit.energy) {
-            amount = this.unit.energy;
-          }
-          thing.energy += amount;
-          this.unit.energy -= amount;
-          results.push((this.working = true));
-        }
-        return results;
       }
+      this.working = this.worked > 0;
+      sim.timeEnd("EnergyTransfer");
+      return;
     };
 
     EnergyTransfer.prototype.draw = function () {
@@ -2233,34 +2246,34 @@
         this.unit.cloak = this.unit.cloak * 0.99875;
       }
       ref = this.unit.closestEnemies();
-      results = [];
       for (i = 0, len = ref.length; i < len; i++) {
         other = ref[i];
-        if (other.slowed === true) {
-          continue;
-        }
+        //if (other.slowed === true) {
+        //  continue;
+        //}
         distance = v2.distance(this.stasisPos, other.pos);
         if (distance < other.radius + this.range) {
-          other.jump -= 30;
-          if (other.jump < 0) {
-            other.jump = 0;
-          }
-          other.cloak -= 20;
-          if (other.cloak < 0) {
-            other.cloak = 0;
-          }
-          this.unit.cloak = 0;
-          speed = v2.mag(other.vel);
-          if (speed > this.maxSlow) {
-            v2.scale(other.vel, 0.85);
+          if (other.slowed !== true) {
+            other.jump -= 30;
+            if (other.jump < 0) {
+              other.jump = 0;
+            }
+            other.cloak -= 20;
+            if (other.cloak < 0) {
+              other.cloak = 0;
+            }
+            this.unit.cloak = 0;
+            speed = v2.mag(other.vel);
+            if (speed > this.maxSlow) {
+              v2.scale(other.vel, 0.85);
+            }
+            //this.working = true;
+            other.slowed = true;
           }
           this.working = true;
-          results.push((other.slowed = true));
-        } else {
-          results.push(void 0);
         }
       }
-      return results;
+      return;
     };
 
     StasisField.prototype.draw = function () {
@@ -2451,7 +2464,7 @@
     CloakGenerator.prototype.tick = function () {
       if (this.unit.energy > this.useEnergy && this.unit.cloak < this.unit.mass) {
         if (this.unit.cloak > this.unit.mass / 2) {
-          this.unit.energy -= this.useEnergy;
+          this.unit.energy -= this.useEnergy * (Math.min(this.unit.mass - this.unit.cloak, this.genCloak) / this.genCloak);
         }
         this.unit.cloak += this.genCloak;
         if (this.unit.cloak > this.unit.mass) {
@@ -3282,12 +3295,28 @@
 
     HeavyPDBullet.prototype.hitsMultiple = true;
 
-    HeavyPDBullet.prototype.hitUnit = function (thing) {
-      thing.applyDamage(this.damage);
-      if (this.energyDamage) {
-        thing.applyEnergyDamage(this.energyDamage);
+    function HeavyPDBullet() {
+      HeavyPDBullet.__super__.constructor.call(this);
+      this.hitOnce = {};
+      this.damageDone = 0;
+    }
+
+    HeavyPDBullet.prototype.hitMissle = function (thing) {
+      if (!this.dead) {
+        HeavyPDBullet.__super__.hitMissle.call(this, thing);
       }
-      return (this.dead = true);
+    };
+
+    HeavyPDBullet.prototype.hitUnit = function (unit) {
+      if (!this.hitOnce[unit.id] && !this.dead) {
+        var appliedDamage = Math.max(0, Math.min(this.damage, unit.hp + unit.shield));
+        unit.applyDamage(appliedDamage);
+        this.damageDone += appliedDamage;
+        this.hitOnce[unit.id] = true;
+        if (this.damageDone >= this.damage) {
+          this.dead = true;
+        }
+      }
     };
 
     return HeavyPDBullet;
@@ -3710,6 +3739,8 @@
     ArtilleryTurret.prototype.bulletCls = types.ArtilleryBullet;
 
     ArtilleryTurret.prototype.exactRange = true;
+
+    ArtilleryTurret.prototype.engageCloak = true;
 
     ArtilleryTurret.prototype.range = 1700;
 
@@ -4225,6 +4256,8 @@
 
     FlackTurret.prototype.exactRange = true;
 
+    FlackTurret.prototype.engageCloak = true;
+
     FlackTurret.prototype.bulletSpeed = 27;
 
     FlackTurret.prototype.damage = 18;
@@ -4280,7 +4313,8 @@
 
     SniperGun.prototype.name = "Sniper Gun";
 
-    SniperGun.prototype.desc = "Fires a sniper round with high DPS. Its only good at max range and requires massive banks. The sniper ship must not be moving, and it has 18% chance of firing in any one second.";
+    SniperGun.prototype.desc =
+      "Fires a sniper round with high DPS. Its only good at max range and requires massive banks. The sniper ship must not be moving, and it has 18% chance of firing in any one second.";
 
     SniperGun.prototype.hp = 10;
 
@@ -4407,6 +4441,10 @@
 
     EMPOrb2.prototype.split = 0;
 
+    EMPOrb2.prototype.staged = false;
+
+    EMPOrb2.prototype.retargeting = false;
+
     EMPOrb2.prototype.clientTick = function () {
       var exp, exp2;
       if (this.life > this.maxLife / 4 && this.split === 0) {
@@ -4457,17 +4495,24 @@
       if (this.dead) {
         return;
       }
-      if (this.life > this.maxLife / 4) {
-        return v2.add(this.pos, this.vel);
+      if (this.staged) {
+        v2.add(this.pos, this.vel);
       } else {
-        return v2.add(this.pos, this._slowVel);
+        v2.add(this.pos, this._slowVel);
       }
     };
 
     EMPOrb2.prototype.tick = function () {
       var exp;
-      if (this.life < this.maxLife / 4) {
-        this.life += Math.round(Math.random());
+
+      var old_staged = this.staged;
+
+      if (!this.staged && this.life >= this.maxLife / 4) {
+        this.staged = true;
+      }
+
+      if (!this.staged) {
+        this.life += 0.5;
       } else {
         this.life += 1;
         this.scan();
@@ -4485,7 +4530,7 @@
         exp.vel = [0, 0];
         exp.rot = 0;
         exp.radius = 1;
-        return (sim.things[exp.id] = exp);
+        sim.things[exp.id] = exp;
       }
     };
 
@@ -4532,6 +4577,11 @@
     EMPGun2.prototype.energyDamage = 0;
 
     EMPGun2.prototype.disable = false;
+
+    EMPGun2.prototype.computeAccuRange = function () {
+      var maxLife = Math.floor((this.range / this.bulletSpeed) * (1 + this.overshoot)) + 24;
+      this.range = this.bulletSpeed * maxLife * 1.7;
+    };
 
     return EMPGun2;
   })(Turret);
@@ -4701,6 +4751,8 @@
     BombGun.prototype.onlyInRange = true;
 
     BombGun.prototype.exactRange = true;
+
+    BombGun.prototype.engageCloak = true;
 
     BombGun.prototype.aoe = 100;
 
@@ -5166,16 +5218,80 @@
         unit.applyDamage(this.damage);
         this.hitOnce[unit.id] = true;
       }
-      p = this.waveEffect * this.damage;
-      v2.norm(this.vel, _wave);
-      v2.scale(_wave, -this.direction);
-      dot = v2.dot(unit.vel, _wave);
-      amount = 0;
-      if (dot < p) {
-        amount = p;
+      var mode = "mass_versus";
+      switch (mode) {
+        case "mass_versus":
+          var p1 = this.origin.mass / (unit.mass + this.origin.mass);
+          var p2 = unit.mass / (unit.mass + this.origin.mass);
+
+          p1 = this.waveEffect * this.damage * (isNaN(p1) ? 0 : p1);
+          p2 = this.waveEffect * this.damage * (isNaN(p2) ? 0 : p2);
+
+          v2.norm(this.vel, _wave);
+          v2.scale(_wave, -this.direction);
+          dot = v2.dot(unit.vel, _wave);
+          amount = 0;
+          if (dot < p1) {
+            amount = p1;
+          }
+          v2.scale(_wave, amount);
+          v2.add(unit.vel, _wave);
+
+          if (this.origin?.dead === false) {
+            v2.norm(this.vel, _wave);
+            v2.scale(_wave, this.direction);
+            dot = v2.dot(this.origin.vel, _wave);
+            amount = 0;
+            if (dot < p2) {
+              amount = p2;
+            }
+            v2.scale(_wave, amount);
+            v2.add(this.origin.vel, _wave);
+          }
+          break;
+        case "both":
+          p = this.waveEffect * this.damage * 0.5;
+
+          v2.norm(this.vel, _wave);
+          v2.scale(_wave, -this.direction);
+          dot = v2.dot(unit.vel, _wave);
+          amount = 0;
+          if (dot < p) {
+            amount = p;
+          }
+          v2.scale(_wave, amount);
+          v2.add(unit.vel, _wave);
+
+          if (this.origin?.dead === false) {
+            v2.norm(this.vel, _wave);
+            v2.scale(_wave, this.direction);
+            dot = v2.dot(this.origin.vel, _wave);
+            amount = 0;
+            if (dot < p) {
+              amount = p;
+            }
+            v2.scale(_wave, amount);
+            v2.add(this.origin.vel, _wave);
+          }
+          break;
+        default:
+          var waveReciever = mode === "self" ? this.origin : unit;
+          if (waveReciever?.dead !== false) {
+            return;
+          }
+          var direction = mode === "self" ? this.direction : -this.direction;
+          p = this.waveEffect * this.damage;
+          v2.norm(this.vel, _wave);
+          v2.scale(_wave, direction);
+          dot = v2.dot(waveReciever.vel, _wave);
+          amount = 0;
+          if (dot < p) {
+            amount = p;
+          }
+          v2.scale(_wave, amount);
+          v2.add(waveReciever.vel, _wave);
+          break;
       }
-      v2.scale(_wave, amount);
-      return v2.add(unit.vel, _wave);
     };
 
     return WavePullArch;
@@ -5217,6 +5333,8 @@
     WavePullTurret.prototype.damage = 4;
 
     WavePullTurret.prototype.multiHit = true;
+
+    WavePullTurret.prototype.engageCloak = true;
 
     return WavePullTurret;
   })(Turret);
@@ -5439,6 +5557,8 @@
 
     FlameTurret.prototype.disable = false;
 
+    FlameTurret.prototype.engageCloak = true;
+
     return FlameTurret;
   })(Turret);
 
@@ -5480,24 +5600,23 @@
     };
 
     AOEWarhead.prototype.tick = function () {
-      var i, len, other, ref, results;
+      var i, len, other, ref;
       if (this.unit.warheadTest !== sim.step && this.unit.shapeDamage == null) {
         this.unit.warheadTest = sim.step;
         ref = this.unit.closestEnemies();
-        results = [];
         for (i = 0, len = ref.length; i < len; i++) {
           other = ref[i];
           if (v2.distance(other.pos, this.unit.pos) < this.unit.radius + other.radius + 50) {
-            results.push((this.unit.hp = 0));
-          } else {
-            results.push(void 0);
+            this.unit.warheadExplode = true;
           }
         }
-        return results;
       }
     };
 
     AOEWarhead.prototype.postDeath = function () {
+      if (this.unit.vanishDestroyMode) {
+        return;
+      }
       var exp;
       exp = new types.AoeExplosion();
       exp.side = this.unit.side;
@@ -5553,24 +5672,23 @@
     };
 
     EMPWarhead.prototype.tick = function () {
-      var i, len, other, ref, results;
+      var i, len, other, ref;
       if (this.unit.warheadTest !== sim.step && this.unit.shapeDamage == null) {
         this.unit.warheadTest = sim.step;
         ref = this.unit.closestEnemies();
-        results = [];
         for (i = 0, len = ref.length; i < len; i++) {
           other = ref[i];
           if (v2.distance(other.pos, this.unit.pos) < this.unit.radius + other.radius + 50) {
-            results.push((this.unit.hp = 0));
-          } else {
-            results.push(void 0);
+            this.unit.warheadExplode = true;
           }
         }
-        return results;
       }
     };
 
     EMPWarhead.prototype.postDeath = function () {
+      if (this.unit.vanishDestroyMode) {
+        return;
+      }
       var exp;
       exp = new types.AoeExplosion();
       exp.side = this.unit.side;
@@ -5633,24 +5751,23 @@
     };
 
     FlameWarhead.prototype.tick = function () {
-      var i, len, other, ref, results;
+      var i, len, other, ref;
       if (this.unit.warheadTest !== sim.step && this.unit.shapeDamage == null) {
         this.unit.warheadTest = sim.step;
         ref = this.unit.closestEnemies();
-        results = [];
         for (i = 0, len = ref.length; i < len; i++) {
           other = ref[i];
           if (v2.distance(other.pos, this.unit.pos) < this.unit.radius + other.radius + 50) {
-            results.push((this.unit.hp = 0));
-          } else {
-            results.push(void 0);
+            this.unit.warheadExplode = true;
           }
         }
-        return results;
       }
     };
 
     FlameWarhead.prototype.postDeath = function () {
+      if (this.unit.vanishDestroyMode) {
+        return;
+      }
       var exp;
       exp = new types.AoeExplosion();
       exp.side = this.unit.side;
@@ -5726,11 +5843,10 @@
     };
 
     ShapedWarhead.prototype.tick = function () {
-      var i, len, other, ref, results;
+      var i, len, other, ref;
       if (this.unit.warheadTest !== sim.step) {
         this.unit.warheadTest = sim.step;
         ref = this.unit.closestEnemies();
-        results = [];
         for (i = 0, len = ref.length; i < len; i++) {
           other = ref[i];
           if ((other.maxHP + other.maxShield) * 2 < this.unit.shapeDamage) {
@@ -5739,13 +5855,15 @@
           if (v2.distance(other.pos, this.unit.pos) > other.radius + this.unit.radius) {
             continue;
           }
-          results.push((this.unit.hp = 0));
+          this.unit.warheadExplode = true;
         }
-        return results;
       }
     };
 
     ShapedWarhead.prototype.postDeath = function () {
+      if (this.unit.vanishDestroyMode) {
+        return;
+      }
       var exp;
       exp = new types.AoeExplosion();
       exp.side = this.unit.side;
@@ -5809,18 +5927,22 @@
     ModPart.prototype.init = function () {
       var effect, i, len, results, w, ws;
       ws = this.effected_weapons();
-      effect = (1 / 0.85) * Math.pow(0.85, ws.length);
-      results = [];
-      for (i = 0, len = ws.length; i < len; i++) {
-        w = ws[i];
-        w.weaponRange *= 1 + (this.weaponRange / 100) * effect;
-        w.weaponRangeFlat += this.weaponRangeFlat * effect;
-        w.weaponDamage *= 1 + (this.weaponDamage / 100) * effect;
-        w.weaponSpeed += (this.weaponSpeed / 100) * effect;
-        w.weaponReload *= 1 + (this.weaponReload / 100) * effect;
-        results.push((w.weaponEnergy *= 1 + (this.weaponEnergy / 100) * effect));
+      var numeffect = ws.length;
+      var sharePenalty = 0.85;
+      effect = (1 / sharePenalty) * Math.pow(sharePenalty, numeffect);
+      var executeCount = 1;
+      for (let j = 0; j < executeCount; j++) {
+        for (i = 0, len = ws.length; i < len; i++) {
+          w = ws[i];
+          w.weaponRange *= 1 + (this.weaponRange / 100) * effect;
+          w.weaponRangeFlat += this.weaponRangeFlat * effect;
+          w.weaponDamage *= 1 + (this.weaponDamage / 100) * effect;
+          w.weaponSpeed += (this.weaponSpeed / 100) * effect;
+          w.weaponEnergy *= 1 + (this.weaponEnergy / 100) * effect;
+          w.weaponReload *= 1 + (this.weaponReload / 100) * effect;
+        }
       }
-      return results;
+      return;
     };
 
     return ModPart;
