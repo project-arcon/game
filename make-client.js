@@ -16,7 +16,7 @@ const files = [
   "./src/utils.js",
   "./src/db.js",
   "./src/onecup.js",
-  "./src/transloader.js",
+  "./src/transloader-client.js",
   "./src/trans.js",
   "./src/mxserver-client.js",
   "./src/account.js",
