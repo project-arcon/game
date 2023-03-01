@@ -1,3 +1,4 @@
+// here begin src/survival.js
 (function () {
   window.survival = {};
 

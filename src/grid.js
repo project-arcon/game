@@ -1,3 +1,4 @@
+// here begin src/grid.js
 (function () {
   var NxN,
     SIZE,

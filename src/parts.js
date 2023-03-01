@@ -1,3 +1,4 @@
+// here begin src/parts.js
 (function () {
   var AiPart,
     Battery,

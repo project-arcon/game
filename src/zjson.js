@@ -1,3 +1,4 @@
+// here begin src/zjson.js
 /*
 zjson - binary json sirelizer with some strange features
 

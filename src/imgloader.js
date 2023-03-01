@@ -1,3 +1,4 @@
+// here begin src/imgloader.js
 /*
  * Load images into atlas so it can be drawn using `atlas.drawSprite()`
  *

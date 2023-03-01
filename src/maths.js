@@ -1,3 +1,4 @@
+// here begin src/maths.js
 (function () {
   var f, m3, m4, q4, v2, v3, v4;
 

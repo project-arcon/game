@@ -1,3 +1,4 @@
+// here begin src/aidata.js
 (function () {
   ais.all = {};
   ais.all.AlphaStriker = [

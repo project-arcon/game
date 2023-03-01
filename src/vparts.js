@@ -1,3 +1,4 @@
+// here begin src/vparts.js
 const v_parts = [
   {
     prototype: "Reactor2x2",

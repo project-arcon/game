@@ -1,3 +1,4 @@
+// here begin src/sim.js
 (function () {
   var DEBUG,
     _offset,

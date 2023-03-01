@@ -1,3 +1,4 @@
+// here begin src/vbattle.js
 (function () {
   eval(onecup["import"]());
 

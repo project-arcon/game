@@ -1,3 +1,4 @@
+// here begin src/maps.js
 (function () {
   var blue,
     bluebrown,

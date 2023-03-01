@@ -1,3 +1,4 @@
+// here begin src/things.js
 /*
 General Game Objects live here
  */

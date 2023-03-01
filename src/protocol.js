@@ -1,3 +1,4 @@
+// here begin src/protocol.js
 (function () {
   window.prot = {};
 

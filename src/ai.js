@@ -1,3 +1,4 @@
+// here begin src/ai.js
 (function () {
   var _,
     _aAvgPos,

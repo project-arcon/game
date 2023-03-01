@@ -1,3 +1,4 @@
+// here begin src/hspace.js
 (function () {
   var PRIME, clamp, overlapRectCircle;
 

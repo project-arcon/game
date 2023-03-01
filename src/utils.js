@@ -1,3 +1,4 @@
+// here begin src/utils.js
 (function () {
   var stats,
     slice = [].slice,

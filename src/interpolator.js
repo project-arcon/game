@@ -1,3 +1,4 @@
+// here begin src/interpolator.js
 (function () {
   var diffVec,
     bind = function (fn, me) {

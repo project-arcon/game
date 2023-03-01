@@ -1,3 +1,4 @@
+// here begin src/trans.js
 (function () {
   window.translateSheet = window.translateSheet ?? {};
 

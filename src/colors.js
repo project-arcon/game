@@ -1,3 +1,4 @@
+// here begin src/color.js
 (function () {
   var hex, j, len, ref;
 

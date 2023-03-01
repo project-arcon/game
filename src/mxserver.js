@@ -1,3 +1,4 @@
+// here begin src/mxserver.js
 (function () {
   window.mxserver = {};
 
