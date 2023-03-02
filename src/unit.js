@@ -504,7 +504,7 @@
     };
 
     Unit.prototype.shouldDie = function () {
-      return this.requiredDead || (!this.frozen && (this.warheadExplode || (this.hp <= 0)));
+      return this.requiredDead || (!this.frozen && (this.warheadExplode || this.hp <= 0));
     };
 
     Unit.prototype.tick = function () {
@@ -581,31 +581,12 @@
       if ((ref3 = this.target) != null ? ref3.dead : void 0) {
         this.target = null;
       }
-      //if (sim.step % 16 === 0) {
       if (this.burn > 4) {
-        //if (this.hp < 4) {
-        //  this.burn = 0;
-        //}
-        burnTick = sim.flags["instant_burn"] ? this.burn : (this.burn * 0.04) / 16;
+        burnTick = (this.burn * 0.04) / 16;
         this.applyDamage(Math.max(0, Math.min(burnTick, this.shield + this.hp - 4)));
         this.burn -= burnTick;
       } else {
         this.burn = 0;
-      }
-      //}
-      if (sim.flags["stasis_field_hazard"]) {
-        this.jump -= 30;
-        if (this.jump < 0) {
-          this.jump = 0;
-        }
-        this.cloak -= 20;
-        if (this.cloak < 0) {
-          this.cloak = 0;
-        }
-        if (v2.mag(this.vel) > parts.StasisField.prototype.maxSlow) {
-          v2.scale(this.vel, 0.85);
-        }
-        this.slowed = true;
       }
       if (this.shouldDie()) {
         this.kill();

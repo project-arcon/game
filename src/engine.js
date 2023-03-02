@@ -1,18 +1,14 @@
 // here begin src/engine.js
-(function() {
+(function () {
   var canvas, dpr, gl, resizeViewport;
 
   gl = void 0;
 
   canvas = void 0;
 
-  dpr = 1;
+  dpr = window.devicePixelRatio;
 
-  if (window.devicePixelRatio === 2) {
-    dpr = 2;
-  }
-
-  window.Atlas = (function() {
+  window.Atlas = (function () {
     function Atlas(params) {
       this.curSprite = 0;
       this.maxSpritesInBatch = 1024 * 2;
@@ -35,7 +31,7 @@
       this.ready = false;
     }
 
-    Atlas.prototype.preloadList = function() {
+    Atlas.prototype.preloadList = function () {
       var key, results;
       results = [];
       for (key in this.spriteMap) {
@@ -44,9 +40,9 @@
       return results;
     };
 
-    Atlas.prototype.initShader = function() {
+    Atlas.prototype.initShader = function () {
       var compileShader, linkShader, simpleFragment, simpleVertex;
-      compileShader = function(type, src) {
+      compileShader = function (type, src) {
         var shader;
         shader = gl.createShader(type);
         gl.shaderSource(shader, src);
@@ -57,7 +53,7 @@
         }
         return shader;
       };
-      linkShader = function(fragmentSrc, vertexSrc) {
+      linkShader = function (fragmentSrc, vertexSrc) {
         var shader;
         shader = gl.createProgram();
         gl.attachShader(shader, compileShader(gl.FRAGMENT_SHADER, fragmentSrc));
@@ -69,8 +65,10 @@
         }
         return shader;
       };
-      simpleFragment = "precision mediump float;\n\nvarying vec2 vTextureCoord;\nvarying vec4 vColor;\nuniform sampler2D uSampler;\n\nvoid main(void) {\n    vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n    vec4 finalColor = textureColor * vColor;\n    gl_FragColor = finalColor;\n}";
-      simpleVertex = "attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\nattribute vec4 aColor;\n\nvarying vec2 vTextureCoord;\nvarying vec4 vColor;\n\nvoid main(void) {\n    gl_Position = vec4(aVertexPosition, 0.0, 1.0);\n    vColor = aColor;\n    vTextureCoord = aTextureCoord;\n}";
+      simpleFragment =
+        "precision mediump float;\n\nvarying vec2 vTextureCoord;\nvarying vec4 vColor;\nuniform sampler2D uSampler;\n\nvoid main(void) {\n    vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n    vec4 finalColor = textureColor * vColor;\n    gl_FragColor = finalColor;\n}";
+      simpleVertex =
+        "attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\nattribute vec4 aColor;\n\nvarying vec2 vTextureCoord;\nvarying vec4 vColor;\n\nvoid main(void) {\n    gl_Position = vec4(aVertexPosition, 0.0, 1.0);\n    vColor = aColor;\n    vTextureCoord = aTextureCoord;\n}";
       this.shader = linkShader(simpleFragment, simpleVertex);
       gl.useProgram(this.shader);
       this.shader.vertAttr = gl.getAttribLocation(this.shader, "aVertexPosition");
@@ -79,14 +77,14 @@
       gl.enableVertexAttribArray(this.shader.uvsAttr);
       this.shader.colorsAttr = gl.getAttribLocation(this.shader, "aColor");
       gl.enableVertexAttribArray(this.shader.colorsAttr);
-      return this.shader.samplerUniform = gl.getUniformLocation(this.shader, "uSampler");
+      return (this.shader.samplerUniform = gl.getUniformLocation(this.shader, "uSampler"));
     };
 
-    Atlas.prototype.initTexture = function() {
+    Atlas.prototype.initTexture = function () {
       var anisotropic, handleLoadedTexture, loadTexture, max_anisotropy;
-      this.canvas = document.createElement('canvas');
+      this.canvas = document.createElement("canvas");
       this.canvas.className = "atlas";
-      this.originalTextureSize = 1024 * 4;
+      this.originalTextureSize = 1024 * 8;
       this.textureSize = Math.min(this.originalTextureSize, gl.getParameter(gl.MAX_TEXTURE_SIZE));
       this.canvas.width = this.textureSize;
       this.canvas.height = this.textureSize;
@@ -104,7 +102,7 @@
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
       gl.bindTexture(gl.TEXTURE_2D, null);
-      handleLoadedTexture = function(texture) {
+      handleLoadedTexture = function (texture) {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
@@ -112,21 +110,21 @@
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
         gl.bindTexture(gl.TEXTURE_2D, null);
-        return texture.loaded = true;
+        return (texture.loaded = true);
       };
-      return loadTexture = function(src) {
+      return (loadTexture = function (src) {
         var texture;
         texture = gl.createTexture();
         texture.image = new Image();
-        texture.image.onload = function() {
+        texture.image.onload = function () {
           return handleLoadedTexture(texture);
         };
         texture.image.src = src;
         return texture;
-      };
+      });
     };
 
-    Atlas.prototype.initBuffers = function() {
+    Atlas.prototype.initBuffers = function () {
       var a, i, j, ref, x, y;
       for (i = j = 0, ref = this.maxSpritesInBatch; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
         a = 0;
@@ -185,7 +183,7 @@
       return gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indexs, gl.STATIC_DRAW);
     };
 
-    Atlas.prototype.initOffscreenBuffer = function() {
+    Atlas.prototype.initOffscreenBuffer = function () {
       this.rtt = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.rtt);
       this.rtt.width = 64 * dpr;
@@ -206,26 +204,26 @@
       return gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     };
 
-    Atlas.prototype.startFrame = function() {
+    Atlas.prototype.startFrame = function () {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-      return this.frame += 1;
+      return (this.frame += 1);
     };
 
-    Atlas.prototype.startOffscreenFrame = function() {
+    Atlas.prototype.startOffscreenFrame = function () {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.rtt);
       gl.viewport(0, 0, this.rtt.width, this.rtt.height);
       gl.clearColor(0.0, 0.0, 0.0, 0.0);
       return gl.clear(gl.COLOR_BUFFER_BIT);
     };
 
-    Atlas.prototype.endOffscreenFrame = function() {
+    Atlas.prototype.endOffscreenFrame = function () {
       var ctx, i, j, pixelsOut, ref, rttcanvas;
       gl.readPixels(0, 0, this.rtt.width, this.rtt.height, gl.RGBA, gl.UNSIGNED_BYTE, this.pixels);
       rttcanvas = document.createElement("canvas");
       rttcanvas.width = this.rtt.width;
       rttcanvas.height = this.rtt.height;
-      ctx = rttcanvas.getContext('2d');
+      ctx = rttcanvas.getContext("2d");
       pixelsOut = ctx.getImageData(0, 0, this.rtt.width, this.rtt.height);
       if (!(pixelsOut != null ? pixelsOut.data : void 0)) {
         return "";
@@ -238,22 +236,22 @@
       return rttcanvas.toDataURL();
     };
 
-    Atlas.prototype.loadAtlas = function(atlas) {
+    Atlas.prototype.loadAtlas = function (atlas) {
       var xhr;
       xhr = new XMLHttpRequest();
       xhr.open("GET", atlas.src, true);
       xhr.responseType = "arraybuffer";
-      xhr.onprogress = (function(_this) {
-        return function(e) {
+      xhr.onprogress = (function (_this) {
+        return function (e) {
           _this.progress = e.loaded / e.total;
           return onecup.refresh();
         };
       })(this);
-      xhr.onload = (function(_this) {
-        return function(e) {
+      xhr.onload = (function (_this) {
+        return function (e) {
           var encodedData, j, len, ref, s, stringData;
           _this.atlasImage = new Image();
-          _this.atlasImage.onload = function(e) {
+          _this.atlasImage.onload = function (e) {
             var data;
             gl.bindTexture(gl.TEXTURE_2D, _this.texture);
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -269,9 +267,9 @@
             _this.ready = true;
             return onecup.refresh();
           };
-          _this.atlasImage.onerror = function(e) {
+          _this.atlasImage.onerror = function (e) {
             console.log("Could not load atlas image", e);
-            return _this.error = true;
+            return (_this.error = true);
           };
           stringData = "";
           ref = new Uint8Array(xhr.response);
@@ -280,23 +278,23 @@
             stringData += String.fromCharCode(s);
           }
           encodedData = window.btoa(stringData);
-          return _this.atlasImage.src = "data:image/png;base64," + encodedData;
+          return (_this.atlasImage.src = "data:image/png;base64," + encodedData);
         };
       })(this);
       return xhr.send();
     };
 
-    Atlas.prototype.scaleImage = function(image, size) {
+    Atlas.prototype.scaleImage = function (image, size) {
       var ctx;
       canvas = document.createElement("canvas");
       canvas.width = size;
       canvas.height = size;
-      ctx = canvas.getContext('2d');
+      ctx = canvas.getContext("2d");
       ctx.drawImage(image, 0, 0, size, size);
       return canvas;
     };
 
-    Atlas.prototype.beginSprites = function(pos, zoom, viewPort) {
+    Atlas.prototype.beginSprites = function (pos, zoom, viewPort) {
       if (pos == null) {
         pos = [0, 0];
       }
@@ -315,10 +313,10 @@
         this.viewPort[3] = viewPort[3];
       }
       this.viewPort[2] *= zoom / dpr;
-      return this.viewPort[3] *= zoom / dpr;
+      return (this.viewPort[3] *= zoom / dpr);
     };
 
-    Atlas.prototype.drawSprite = function(src, pos, size, rot, color, z) {
+    Atlas.prototype.drawSprite = function (src, pos, size, rot, color, z) {
       var cos, h, i, j, m, mapping, n, sin, sx, sy, w, x, y, zf;
       if (color == null) {
         color = [255, 255, 255, 255];
@@ -365,8 +363,8 @@
       this.colors[i * 16 + 15] = color[3];
       w = (mapping.uv[2] - mapping.uv[0]) * this.originalTextureSize;
       h = (mapping.uv[1] - mapping.uv[3]) * this.originalTextureSize;
-      sx = (w + this.drawMargin * 2) * size[0] / 2;
-      sy = (h + this.drawMargin * 2) * size[1] / 2;
+      sx = ((w + this.drawMargin * 2) * size[0]) / 2;
+      sy = ((h + this.drawMargin * 2) * size[1]) / 2;
       cos = Math.cos(rot);
       sin = Math.sin(rot);
       this.verts[i * 8 + 0] = pos[0] + (-sx * cos + sy * sin);
@@ -384,10 +382,10 @@
         y = this.verts[i * 8 + n * 2 + 1];
         this.verts[i * 8 + n * 2 + 1] = (y + this.viewPort[1]) / this.viewPort[3] / zf;
       }
-      return this.curSprite += 1;
+      return (this.curSprite += 1);
     };
 
-    Atlas.prototype.finishSprites = function(blend) {
+    Atlas.prototype.finishSprites = function (blend) {
       if (blend == null) {
         blend = false;
       }
@@ -411,27 +409,26 @@
       gl.uniform1i(this.shader.samplerUniform, 0);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexsBuf);
       gl.drawElements(gl.TRIANGLES, this.curSprite * 6, gl.UNSIGNED_SHORT, 0);
-      return this.curSprite = 0;
+      return (this.curSprite = 0);
     };
 
     return Atlas;
-
   })();
 
-  window.initGL = function() {
+  window.initGL = function () {
     var contextError;
     canvas = document.getElementById("webGL");
-    contextError = function(e) {
+    contextError = function (e) {
       ui.error = "webGL";
       track("webgl_context_error", {
-        message: e.statusMessage
+        message: e.statusMessage,
       });
-      return ui.contextErrrorMessage = e.statusMessage;
+      return (ui.contextErrrorMessage = e.statusMessage);
     };
     canvas.addEventListener("webglcontextcreationerror", contextError, false);
     canvas.addEventListener("webglcontextlost", contextError, false);
     window.gl = gl = canvas.getContext("webgl", {
-      failIfMajorPerformanceCaveat: true
+      failIfMajorPerformanceCaveat: true,
     });
     if (!gl) {
       console.log("failed to init GL");
@@ -443,12 +440,12 @@
     return true;
   };
 
-  window.onresize = function() {
+  window.onresize = function () {
     resizeViewport();
     return onecup.refresh();
   };
 
-  resizeViewport = function() {
+  resizeViewport = function () {
     if (!canvas) {
       return;
     }
@@ -458,21 +455,21 @@
     canvas.style.height = window.innerHeight + "px";
     if (gl != null) {
       gl.viewportWidth = canvas.width;
-      return gl.viewportHeight = canvas.height;
+      return (gl.viewportHeight = canvas.height);
     }
   };
 
-  window.togglePointerLock = function() {
+  window.togglePointerLock = function () {
     canvas = document.getElementById("webGL");
     canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
     return canvas.requestPointerLock();
   };
 
-  window.isFullScreen = function() {
+  window.isFullScreen = function () {
     return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
   };
 
-  window.toggleFullScreen = function() {
+  window.toggleFullScreen = function () {
     if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
       enterFullScreen();
     } else {
@@ -480,7 +477,7 @@
     }
   };
 
-  window.enterFullScreen = function() {
+  window.enterFullScreen = function () {
     if (document.documentElement.requestFullscreen) {
       return document.documentElement.requestFullscreen();
     } else if (document.documentElement.msRequestFullscreen) {
@@ -492,7 +489,7 @@
     }
   };
 
-  window.exitFullScreen = function() {
+  window.exitFullScreen = function () {
     if (document.exitFullscreen) {
       return document.exitFullscreen();
     } else if (document.msExitFullscreen) {
@@ -503,8 +500,4 @@
       return document.webkitExitFullscreen();
     }
   };
-
-}).call(this);
-;
-
-
+}.call(this));

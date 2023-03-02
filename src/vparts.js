@@ -1,4 +1,12 @@
 const vblocks = {
+  Reactor1x1: {
+    image: "reactor_1x1.png",
+    vscale: 0.318,
+  },
+  Reactor2x1: {
+    image: "reactor_2x1.png",
+    vscale: 0.318,
+  },
   Reactor2x2: {
     image: "reactor_2x2.png",
     vscale: 0.318,
@@ -42,7 +50,7 @@ const vturrets = {
   RingTurret: {
     image: "ring_reload.png",
     has_ready: true,
-    vscale: 0.48,
+    vscale: 0.42,
   },
   //RamTurret: "turWavePush.png",
   TorpTurret: {
@@ -50,18 +58,22 @@ const vturrets = {
     has_ready: true,
     vscale: 0.48,
   },
-  //MissileTurret: "turMissile.png",
+  MissileTurret: {
+    image: "missile_reload.png",
+    has_ready: true,
+    vscale: 0.48,
+  },
   //ArtilleryTurret: "turLong1.png",
   //SidewinderTurret: "turMine.png",
   PlasmaTurret: {
     image: "plasma_reload.png",
     has_ready: true,
-    vscale: 0.48,
+    vscale: 0.52,
   },
   LightPlasmaTurret: {
     image: "gatling_reload.png",
     has_ready: true,
-    vscale: 0.48,
+    vscale: 0.52,
   },
   LightBeamTurret: {
     image: "l.beam_reload.png",
@@ -76,24 +88,28 @@ const vturrets = {
   FlackTurret: {
     image: "flak_reload.png",
     has_ready: true,
-    vscale: 0.42,
+    vscale: 0.38,
   },
   //SniperGun: "turSnipe1.png",
   EMPGun: {
     image: "emp_reload.png",
     has_ready: true,
-    vscale: 0.48,
+    vscale: 0.38,
   },
   //EMPGun2: "turFizzleGun.png",
   //BombGun: "turBomb.png",
   AutoTurret: {
     image: "auto_cannon_reload.png",
     has_ready: false,
-    vscale: 0.42,
+    vscale: 0.38,
   },
   //Shotgun: "turAutoCannon.png",
   //MachineGun: "turAutoCannon.png",
-  //TeslaTurret: "turTesla.png",
+  TeslaTurret: {
+    image: "tesla_reload.png",
+    has_ready: true,
+    vscale: 0.52,
+  },
   //WavePullTurret: "turWavePull.png",
   //WavePushTurret: "turWavePush.png",
   //FlameTurret: "turFlame.png"
@@ -159,7 +175,7 @@ Part.prototype.draw = function () {
     c = this.unit.color;
     if (this.pos[0] < 0 && this.flip) flip = -this.vscale;
     else flip = this.vscale;
-    if (this.has_ready) baseAtlas.drawSprite("vparts/" + this.image.replace("reload.png", "ready.png"), this.worldPos, [flip, -this.vscale], rot, [255, 255, 255, alpha]);
+    if (this.has_ready && this.working) baseAtlas.drawSprite("vparts/" + this.image.replace("reload.png", "ready.png"), this.worldPos, [flip, -this.vscale], rot, [255, 255, 255, alpha]);
     else baseAtlas.drawSprite("vparts/" + this.image, this.worldPos, [flip, -this.vscale], rot, [255, 255, 255, alpha]);
     if (this.working) return baseAtlas.drawSprite("vparts/" + this.image.replace("reload.png", "bloom.png"), this.worldPos, [flip, -this.vscale], rot, [c[0], c[1], c[2], alpha * this.opacity]);
   }
@@ -193,5 +209,38 @@ parts["RingTurret"].prototype.draw = function () {
     this.spin += 0.0001 * this.damage;
   }
   Turret.__super__.draw.call(this);
-  baseAtlas.drawSprite("parts/" + "fireRing.png", this.worldPos, [0.72, 0.72], this.spin);
+  c = this.unit.color;
+  alpha = 255;
+  if (this.unit.cloakFade > 0) {
+    alpha = 255 - this.unit.cloakFade * 200;
+  }
+  return baseAtlas.drawSprite("parts/" + "fireRing.png", this.worldPos, [0.72, 0.72], this.spin, [c[0], c[1], c[2], alpha]);
+};
+
+parts["TeslaTurret"].prototype.spriteIndex = 0;
+parts["TeslaTurret"].prototype.spriteTimer = 0;
+
+parts["TeslaTurret"].prototype.draw = function () {
+  Turret.__super__.draw.call(this);
+  if (!this.working) return;
+
+  // Update the spriteTimer variable based on the damage
+  this.spriteTimer += 1;
+  if (this.spriteTimer >= (120 * 4) / this.damage) {
+    // Change the sprite every 60 frames (1 second)
+    this.spriteTimer = 0;
+    // Choose a sprite based on the damage and update the spriteIndex variable
+    var spriteIndex = Math.floor(Math.random() * 4);
+    this.spriteIndex = spriteIndex;
+  }
+
+  c = this.unit.color;
+  // Choose the sprite based on the spriteIndex and draw it without adding any rotation
+  var spriteName = "tesla_zap" + (this.spriteIndex + 1);
+  var rotation = (0.0001 * (Math.random() * this.damage)) / 8; // Scale the random angle by a factor of PI/8 to reduce the amount of rotation
+  alpha = 255;
+  if (this.unit.cloakFade > 0) {
+    alpha = 255 - this.unit.cloakFade * 200;
+  }
+  return baseAtlas.drawSprite("vparts/" + spriteName + ".png", this.worldPos, [this.vscale, this.vscale], rotation, [255, 255, 255, alpha]);
 };
