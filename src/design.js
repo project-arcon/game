@@ -76,7 +76,7 @@
 
     DesignMode.prototype.overlapPartsPlacement = false;
 
-    DesignMode.prototype.hideBackground = true;
+    DesignMode.prototype.hideBackground = false;
 
     DesignMode.prototype.manualLocked = false;
 
