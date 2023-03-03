@@ -150,7 +150,7 @@
     var a, fillColor, fns, r, spotColor;
     window.mr = new MTwist(seed);
     sim.things = {};
-    switch (sim.startedInServerType) {
+    switch (sim.serverType) {
       case "survival":
         survival.genSurvival();
         break;

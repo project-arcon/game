@@ -15,6 +15,7 @@ const files = [
   "./src/colors.js",
   "./src/maps.js",
   "./src/sim.js",
+  "./src/simsend.js",
   "./src/survival.js",
   "./src/things.js",
   "./src/unit.js",
