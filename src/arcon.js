@@ -281,7 +281,7 @@
        */
       var fn, frame, galaxyAway, localAway, packet, popQ, step;
       if (typeof intp !== "undefined" && intp !== null ? intp.local : void 0) {
-        packet = sim.send();
+        packet = window.sendSim(sim);
         step = sim.step;
         galaxyAway = sim.galaxyStar && ui.mode !== "battle";
         //localAway = ui.mode !== "battle" && intp.state === "running";

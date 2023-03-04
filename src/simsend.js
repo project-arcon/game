@@ -1,6 +1,19 @@
 // here begin src/sim.js
 (function () {
-  
+  var _pos, isArray;
+
+  _pos = v2.create();
+
+  isArray = function (a) {
+    if (Array.isArray(a)) {
+      return true;
+    }
+    if (a instanceof Float64Array) {
+      return true;
+    }
+    return false;
+  };
+
   window.sendSim = function (sim) {
     var _,
       changes,
@@ -17,7 +30,6 @@
       len5,
       len6,
       len7,
-      len8,
       m,
       o,
       p,
@@ -28,36 +40,26 @@
       predictable,
       q,
       r,
-      ref,
-      ref1,
-      ref10,
-      ref11,
-      ref12,
-      ref2,
-      ref3,
-      ref4,
-      ref5,
-      ref6,
-      ref7,
-      ref8,
-      ref9,
+      things,
+      thing_fields,
+      players,
+      player_fields,
+      sim_fields,
+      parts,
       s,
-      send,
       splayers,
       sthings,
       t,
-      targetId,
       thing,
       v,
       x,
-      y,
-      z;
+      y;
     sim.timeStart("send");
     sim.timeStart("things");
     sthings = [];
-    ref = sim.things;
-    for (id in ref) {
-      thing = ref[id];
+    things = sim.things;
+    for (id in things) {
+      thing = things[id];
       changes = [];
       changes.push(["thingId", thing.id]);
       if (thing.net == null) {
@@ -71,9 +73,9 @@
       } else {
         s = thing.net;
       }
-      ref1 = sim.thingFields;
-      for (l = 0, len1 = ref1.length; l < len1; l++) {
-        f = ref1[l];
+      thing_fields = sim.thingFields;
+      for (l = 0, len1 = thing_fields.length; l < len1; l++) {
+        f = thing_fields[l];
         v = thing[f];
         if (v != null && !simpleEquals(s[f], v)) {
           if (isArray(v)) {
@@ -110,28 +112,29 @@
         changes.push(["vel", thing.vel]);
         changes.push(["pos", thing.pos]);
       }
-      if (s.targetId !== ((ref2 = thing.target) != null ? ref2.id : void 0)) {
-        s.targetId = (ref3 = thing.target) != null ? ref3.id : void 0;
+      if (s.targetId !== (thing.target?.id ?? undefined)) {
+        s.targetId = thing.target?.id ?? undefined;
         changes.push(["targetId", s.targetId]);
       }
-      if (s.originId !== ((ref4 = thing.origin) != null ? ref4.id : void 0)) {
-        s.originId = (ref5 = thing.origin) != null ? ref5.id : void 0;
+
+      if (s.originId !== (thing.origin?.id ?? undefined)) {
+        s.originId = thing.origin?.id ?? undefined;
         changes.push(["originId", s.originId]);
       }
-      if (s.followId !== ((ref6 = thing.follow) != null ? ref6.id : void 0)) {
-        s.followId = (ref7 = thing.follow) != null ? ref7.id : void 0;
+
+      if (s.followId !== (thing.follow?.id ?? undefined)) {
+        s.followId = thing.follow?.id ?? undefined;
         changes.push(["followId", s.followId]);
       }
-      if (sim.local) {
-        if (s.message !== thing.message) {
-          s.message = thing.message;
-          changes.push(["message", s.message]);
-        }
+
+      if (sim.local && s.message !== thing.message) {
+        s.message = thing.message;
+        changes.push(["message", s.message]);
       }
       if (thing.parts != null) {
-        ref8 = thing.parts;
-        for (partId = o = 0, len3 = ref8.length; o < len3; partId = ++o) {
-          part = ref8[partId];
+        parts = thing.parts;
+        for (partId = o = 0, len3 = parts.length; o < len3; partId = ++o) {
+          part = parts[partId];
           changes.push(["partId", partId]);
           s = part.net;
           if (!s) {
@@ -141,11 +144,11 @@
             changes.push(["partWorking", part.working]);
             s.working = part.working;
           }
-          if (part.weapon) {
-            targetId = ((ref9 = part.target) != null ? ref9.id : void 0) || 0;
-            if (s.targetId !== targetId) {
-              changes.push(["partTargetId", targetId]);
-              s.targetId = targetId;
+          if (part.weapon && part.target?.id) {
+            const target_id = part.target.id;
+            if (s.targetId !== target_id) {
+              s.targetId = target_id;
+              changes.push(["partTargetId", target_id]);
             }
           }
           if (changes[changes.length - 1][0] === "partId") {
@@ -160,9 +163,9 @@
     sim.timeEnd("things");
     sim.timeStart("players");
     splayers = [];
-    ref10 = sim.players;
-    for (q = 0, len4 = ref10.length; q < len4; q++) {
-      player = ref10[q];
+    players = sim.players;
+    for (q = 0, len4 = players.length; q < len4; q++) {
+      player = players[q];
       changes = [];
       changes.push(["playerNumber", player.number]);
       if (player.net == null) {
@@ -170,9 +173,9 @@
       } else {
         s = player.net;
       }
-      ref11 = sim.playerFields;
-      for (r = 0, len5 = ref11.length; r < len5; r++) {
-        f = ref11[r];
+      player_fields = sim.playerFields;
+      for (r = 0, len5 = player_fields.length; r < len5; r++) {
+        f = player_fields[r];
         v = player[f];
         if (v != null && !simpleEquals(s[f], v)) {
           if (isArray(v)) {
@@ -200,9 +203,9 @@
     if (!s) {
       sim.net = s = {};
     }
-    ref12 = sim.simFields;
-    for (y = 0, len7 = ref12.length; y < len7; y++) {
-      f = ref12[y];
+    sim_fields = sim.simFields;
+    for (y = 0, len7 = sim_fields.length; y < len7; y++) {
+      f = sim_fields[y];
       if (!simpleEquals(s[f], sim[f])) {
         data[f] = sim[f];
         s[f] = sim[f];

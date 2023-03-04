@@ -3,6 +3,10 @@ const vblocks = {
     image: "reactor_1x1.png",
     vscale: 0.318,
   },
+  Reactor1x2: {
+    image: "reactor_1x2.png",
+    vscale: 0.318,
+  },
   Reactor2x1: {
     image: "reactor_2x1.png",
     vscale: 0.318,
@@ -29,6 +33,10 @@ const vblocks = {
   },
   Battery2x1: {
     image: "battery_2x1.png",
+    vscale: 0.318,
+  },
+  Battery1x2: {
+    image: "battery_1x2.png",
     vscale: 0.318,
   },
   Battery2x2: {
@@ -94,7 +102,7 @@ const vturrets = {
   EMPGun: {
     image: "emp_reload.png",
     has_ready: true,
-    vscale: 0.38,
+    vscale: 0.44,
   },
   //EMPGun2: "turFizzleGun.png",
   //BombGun: "turBomb.png",
@@ -204,9 +212,9 @@ Turret.prototype.draw = function () {
 
 parts["RingTurret"].prototype.draw = function () {
   if (this.working) {
-    this.spin += 0.001 * this.damage;
+    this.spin += 0.01 * this.damage;
   } else {
-    this.spin += 0.0001 * this.damage;
+    this.spin += 0.001 * this.damage;
   }
   Turret.__super__.draw.call(this);
   c = this.unit.color;
@@ -214,7 +222,7 @@ parts["RingTurret"].prototype.draw = function () {
   if (this.unit.cloakFade > 0) {
     alpha = 255 - this.unit.cloakFade * 200;
   }
-  return baseAtlas.drawSprite("parts/" + "fireRing.png", this.worldPos, [0.72, 0.72], this.spin, [c[0], c[1], c[2], alpha]);
+  return baseAtlas.drawSprite("parts/" + "fizzleMineEnergy.png", this.worldPos, [1.2, 1.2], this.spin, [255, 255, 255, alpha]);
 };
 
 parts["TeslaTurret"].prototype.spriteIndex = 0;

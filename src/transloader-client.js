@@ -8,7 +8,7 @@
   translateSheet["en"] = {
     "server.reconnected_to_root": "Server reconnected to root.",
     "server.player_disconnect": "{1} disconnected.",
-    "server.crash.type.send": "sim.send() failure. Network package was too powerful to process.",
+    "server.crash.type.send": "window.sendSim() failure. Network package was too powerful to process.",
     "server.crash.type.sim": "sim.simulate() root level exception occured.",
     "server.crash.type.on_player_message": "server.onMessage() root level exception occured.",
     "server.crash.restart_sim": "Sim crashed, automatically restarting new sim.",
@@ -57,6 +57,6 @@
     "mode.survival.first_wave": "Get ready. First wave in {1}s!",
     "mode.survival.wave": "Spawning wave {1}! Strength: {2}",
     "mode.survival.report": "The survivors survived {1} waves!",
-    "lang_name": "English"
-  }  
+    lang_name: "English",
+  };
 }.call(this));
