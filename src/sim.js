@@ -152,10 +152,8 @@
     Sim.prototype.nGamesPlayed = 0;
 
     Sim.prototype.validTypes = {
-      //"sandbox": "sandbox",
+      sandbox: "sandbox",
       "1v1": "1v1",
-      //"1v1r": "1v1r",
-      //"1v1t": "1v1t",
       "2v2": "2v2",
       "3v3": "3v3",
       survival: "survival",
@@ -307,7 +305,7 @@
       }
       if (this.serverType !== config.type) {
         this.serverType = config.type;
-        this.sayToServer("players.config_game", p.name, type);
+        this.sayToServer("players.config_game", p.name, config.type);
         if (typeof serverTick === "function") {
           serverTick();
         }

@@ -49,9 +49,6 @@
         if (part.disable) {
           issues.push("Has parts that have been discontinued.");
         }
-        if (part.ghostCopy) {
-          issues.push("Has parts from a copied ship.");
-        }
         if (!part.dir < 0 || part.dir > 3 || modulo(part.dir, 1) !== 0) {
           issues.push("Invalid part rotation");
         }

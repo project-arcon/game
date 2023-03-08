@@ -188,9 +188,6 @@
         if (part.weapon) {
           this.weapons.push(part);
         }
-        if (p.ghostCopy) {
-          part.ghostCopy = true;
-        }
         this.parts.push(part);
         this.cost += part.cost || 0;
         this.hp += part.hp || 0;
@@ -307,12 +304,6 @@
           type: part.constructor.name,
           dir: part.dir,
         };
-        if (this.ghostCopy || part.ghostCopy) {
-          partSpec.ghostCopy = true;
-          if (part.decal) {
-            continue;
-          }
-        }
         specParts.push(partSpec);
       }
       return {
@@ -350,54 +341,6 @@
       }
     };
 
-    var partOccupiedGrid = function (part) {
-      var xsize, ysize;
-      var result = [];
-      if (part.dir % 2 === 0) {
-        xsize = part.size[0];
-        ysize = part.size[1];
-      } else {
-        xsize = part.size[1];
-        ysize = part.size[0];
-      }
-      var basex = part.pos[0] - ((xsize - 1) / 2) * 20;
-      var basey = part.pos[1] - ((ysize - 1) / 2) * 20;
-      for (var x = 0; x < xsize; x++) {
-        for (var y = 0; y < ysize; y++) {
-          result.push([basex + x * 20, basey + y * 20]);
-        }
-      }
-      return result;
-    };
-
-    var partCorners = function (part) {
-      var xsize, ysize;
-      var result = [];
-      if (part.dir % 2 === 0) {
-        xsize = part.size[0];
-        ysize = part.size[1];
-      } else {
-        xsize = part.size[1];
-        ysize = part.size[0];
-      }
-      var xmin = part.pos[0] - ((xsize - 1) / 2) * 20;
-      var ymin = part.pos[1] - ((ysize - 1) / 2) * 20;
-      var xmax = xmin + (xsize - 1) * 20;
-      var ymax = ymin + (ysize - 1) * 20;
-
-      result.push([xmin, ymin]);
-      if (xmin !== xmax) {
-        result.push([xmax, ymin]);
-      }
-      if (ymin !== ymax) {
-        result.push([xmin, ymax]);
-      }
-      if (xmin !== xmax && ymin !== ymax) {
-        result.push([xmax, ymax]);
-      }
-
-      return result;
-    };
     Unit.prototype.computeRadius = function () {
       var j, len, part, radius, ref, v;
       v = v2.create();
@@ -407,16 +350,15 @@
         if (!!part.decal) {
           continue;
         }
-        var grids = partCorners(part);
-        for (let i = 0; i < grids.length; i++) {
-          const pos = grids[i];
-          v2.set(pos, v);
-          v2.sub(v, this.center);
-          radius = v2.mag(v);
-          if (radius > this.radius) {
-            this.radius = radius;
-          }
+        v2.set(part.pos, v);
+        v2.sub(v, this.center);
+        radius = v2.mag(v);
+        if (radius > this.radius) {
+          this.radius = radius;
         }
+      }
+      if (this.radius > 500) {
+        return (this.radius = 500);
       }
     };
 
@@ -466,6 +408,9 @@
         exp = new types.Debree();
         if (part.stripe) {
           exp.image = "parts/gray-" + part.image;
+        } else if (part.vturret || part.vblock) {
+          exp.scale = [0.5, 0.5];
+          exp.image = "vparts/" + part.image;
         } else {
           exp.image = "parts/" + part.image;
         }
@@ -1387,9 +1332,6 @@
       alpha = 255;
       if (this.unit.cloakFade > 0) {
         alpha = 255 - this.unit.cloakFade * 200;
-      }
-      if (this.ghostCopy) {
-        alpha = 170;
       }
       if (this.stripe) {
         baseAtlas.drawSprite("parts/gray-" + this.image, this.worldPos, [flip, -1], rot, [255, 255, 255, alpha]);

@@ -93,9 +93,7 @@
       this.pos = [0, 0];
       this.unit = new types.Unit("{}");
       this.dragUnit = new types.Unit("{}");
-      (ref = computeGrid(commander, this.unit)),
-        (this.grid = ref[0]),
-        (badParts = ref[1]);
+      (ref = computeGrid(commander, this.unit)), (this.grid = ref[0]), (badParts = ref[1]);
       this.fresh = true;
       this.hoverOverParts = [];
       this.hoverTipParts = [];
@@ -195,12 +193,7 @@
     };
 
     DesignMode.prototype.disabledEditing = function () {
-      return (
-        designMode.aiEdit ||
-        /*designMode.locked || */ designMode.showShareBox ||
-        designMode.showShareBoxJson ||
-        designMode.manualLocked
-      );
+      return designMode.aiEdit || /*designMode.locked || */ designMode.showShareBox || designMode.showShareBoxJson || designMode.manualLocked;
     };
 
     DesignMode.prototype.onmousedown = function (e) {
@@ -233,11 +226,7 @@
             ref = this.unit.parts;
             for (j = 0, len = ref.length; j < len; j++) {
               part = ref[j];
-              if (
-                v2.distance(part.pos, symmetryPos) < 0.1 &&
-                part.constructor.name === this.draggingPart.constructor.name &&
-                part !== this.draggingPart
-              ) {
+              if (v2.distance(part.pos, symmetryPos) < 0.1 && part.constructor.name === this.draggingPart.constructor.name && part !== this.draggingPart) {
                 this.draggingPart2 = part;
                 this.dragUnit.parts.push(this.draggingPart2);
                 break;
@@ -256,10 +245,7 @@
             }
             return results;
           }.call(this);
-          if (
-            e.altKey &&
-            !((ref1 = sim.galaxyStar) != null ? ref1.noDesignTools : void 0)
-          ) {
+          if (e.altKey && !((ref1 = sim.galaxyStar) != null ? ref1.noDesignTools : void 0)) {
             this.draggingPart = null;
             this.draggingPart2 = null;
             this.dragUnit.parts = [];
@@ -269,9 +255,7 @@
         }
         e.preventDefault();
       }
-      if (
-        ((ref2 = sim.galaxyStar) != null ? ref2.noDesignTools : void 0) === true
-      ) {
+      if (((ref2 = sim.galaxyStar) != null ? ref2.noDesignTools : void 0) === true) {
         onecup.refresh();
       }
       return this.save();
@@ -283,17 +267,12 @@
         return;
       }
       if (this.draggingPart) {
-        if (
-          this.outsidePartsPlacement ||
-          (Math.abs(this.pos[0]) < NxN * 10 && Math.abs(this.pos[1]) < NxN * 10)
-        ) {
+        if (this.outsidePartsPlacement || (Math.abs(this.pos[0]) < NxN * SIZE && Math.abs(this.pos[1]) < NxN * SIZE)) {
           placePart = (function (_this) {
             return function (part) {
               var p, ref;
               part.pos = v2.create(part.pos);
-              if (
-                !((ref = sim.galaxyStar) != null ? ref.noDesignTools : void 0)
-              ) {
+              if (!((ref = sim.galaxyStar) != null ? ref.noDesignTools : void 0)) {
                 _this.unit.parts = function () {
                   var j, len, ref1, results;
                   ref1 = this.unit.parts;
@@ -303,10 +282,7 @@
                   results = [];
                   for (j = 0, len = ref1.length; j < len; j++) {
                     p = ref1[j];
-                    if (
-                      v2.distance(part.pos, p.pos) < 0.1 &&
-                      part.constructor.name === p.constructor.name
-                    ) {
+                    if (v2.distance(part.pos, p.pos) < 0.1 && part.constructor.name === p.constructor.name) {
                       continue;
                     }
                     results.push(p);
@@ -324,10 +300,7 @@
           }
           playSound("sounds/ui/flick.wav");
         } else {
-          if (
-            ((ref = sim.galaxyStar) != null ? ref.noDesignTools : void 0) ===
-            true
-          ) {
+          if (((ref = sim.galaxyStar) != null ? ref.noDesignTools : void 0) === true) {
             onecup.refresh();
             return;
           }
@@ -384,60 +357,13 @@
         return partScore(a) - partScore(b);
       });
       this.unit.parts.forEach((p) => (p.ghostCopy = false));
-      (ref = computeGrid(commander, this.unit)),
-        (this.grid = ref[0]),
-        (badParts = ref[1]);
-      if (badParts && false) {
-        for (j = 0, len = badParts.length; j < len; j++) {
-          badPart = badParts[j];
-          this.unit.parts = function () {
-            var l, len1, ref1, results;
-            ref1 = this.unit.parts;
-            results = [];
-            for (l = 0, len1 = ref1.length; l < len1; l++) {
-              p = ref1[l];
-              if (p !== badPart) {
-                results.push(p);
-              }
-            }
-            return results;
-          }.call(this);
-        }
-        return onecup.refresh();
-      }
+      (ref = computeGrid(commander, this.unit)), (this.grid = ref[0]), (badParts = ref[1]);
     };
 
     DesignMode.prototype.warpIn = 0;
 
     DesignMode.prototype.draw = function () {
-      var adjustAndDrawUnit,
-        bg_zoom,
-        className,
-        color,
-        flip,
-        hoverOverPart,
-        j,
-        l,
-        len,
-        len1,
-        len2,
-        m,
-        part,
-        partNum,
-        ref,
-        ref1,
-        ref2,
-        row,
-        s,
-        size,
-        t,
-        th,
-        tip,
-        x,
-        xoff,
-        y,
-        yoff,
-        z;
+      var adjustAndDrawUnit, bg_zoom, className, color, flip, hoverOverPart, j, l, len, len1, len2, m, part, partNum, ref, ref1, ref2, row, s, size, t, th, tip, x, xoff, y, yoff, z;
       if (designMode.locked) {
         this.draggingPart = null;
         this.hoverOverPart = null;
@@ -450,20 +376,8 @@
       color = commander.color;
       bg_zoom = Math.max(window.innerWidth, window.innerHeight) / 128;
       z = bg_zoom * this.zoom;
-      baseAtlas.drawSprite(
-        "img/newbg/fill.png",
-        [-this.focus[0], -this.focus[1]],
-        [z, z],
-        0,
-        this.hideBackground ? [0, 0, 0, 0] : mapping.themes[0].fillColor
-      );
-      baseAtlas.drawSprite(
-        "img/newbg/gradient.png",
-        [-this.focus[0], -this.focus[1]],
-        [z, z],
-        0,
-        this.hideBackground ? [0, 0, 0, 0] : mapping.themes[0].spotColor
-      );
+      baseAtlas.drawSprite("img/newbg/fill.png", [-this.focus[0], -this.focus[1]], [z, z], 0, this.hideBackground ? [0, 0, 0, 0] : mapping.themes[0].fillColor);
+      baseAtlas.drawSprite("img/newbg/gradient.png", [-this.focus[0], -this.focus[1]], [z, z], 0, this.hideBackground ? [0, 0, 0, 0] : mapping.themes[0].spotColor);
       hoverOverPart = null;
       var hoverOverParts = [];
       ref = this.unit.parts;
@@ -519,26 +433,12 @@
               color = [0, 255, 0, 35];
             } else if (t.solid) {
               continue;
-            } else if (
-              NxN / 2 - 1 <= x &&
-              x <= NxN / 2 &&
-              NxN / 2 - 1 <= y &&
-              y <= NxN / 2
-            ) {
+            } else if (NxN / 2 - 1 <= x && x <= NxN / 2 && NxN / 2 - 1 <= y && y <= NxN / 2) {
               color = [0, 0, 0, 50];
             } else {
               color = [0, 0, 0, 25];
             }
-            baseAtlas.drawSprite(
-              "parts/sel1x1.png",
-              [
-                (x - NxN / 2) * SIZE + SIZE / 2,
-                (y - NxN / 2) * SIZE + SIZE / 2,
-              ],
-              [0.8, 0.8],
-              0,
-              color
-            );
+            baseAtlas.drawSprite("parts/sel1x1.png", [(x - NxN / 2) * SIZE + SIZE / 2, (y - NxN / 2) * SIZE + SIZE / 2], [0.8, 0.8], 0, color);
           }
         }
       }
@@ -564,23 +464,14 @@
         if (this.draggingPart.dir % 2 === 1) {
           (ref2 = [yoff, xoff]), (xoff = ref2[0]), (yoff = ref2[1]);
         }
-        this.pos = [
-          Math.floor(this.mouse[0] / s) * s + xoff,
-          Math.floor(this.mouse[1] / s) * s + yoff,
-        ];
+        this.pos = [Math.floor(this.mouse[0] / s) * s + xoff, Math.floor(this.mouse[1] / s) * s + yoff];
         this.wiggle *= 0.9;
         th = Math.sin(this.wiggle / 50);
         v2.set(this.pos, this.draggingPart.worldPos);
         v2.set(this.pos, this.draggingPart.pos);
         if (this.draggingPart.adjacent) {
           s = 35 / 255;
-          baseAtlas.drawSprite(
-            "img/point02.png",
-            [this.pos[0], this.pos[1]],
-            [s, s],
-            0,
-            white
-          );
+          baseAtlas.drawSprite("img/point02.png", [this.pos[0], this.pos[1]], [s, s], 0, white);
         }
       }
       if (designMode.symmetryMode) {
@@ -644,71 +535,23 @@
       if (part.prototype.size[0] === 4 || part.prototype.size[1] === 4) {
         scale *= 1.5;
       }
-      baseAtlas.beginSprites([0, 0], scale, [
-        0,
-        0,
-        -baseAtlas.rtt.width,
-        baseAtlas.rtt.height,
-      ]);
+      baseAtlas.beginSprites([0, 0], scale, [0, 0, -baseAtlas.rtt.width, baseAtlas.rtt.height]);
       if (part.prototype.stripe) {
-        baseAtlas.drawSprite(
-          "parts/gray-" + part.prototype.image,
-          [0, 0],
-          [-1, 1],
-          0,
-          white
-        );
-        baseAtlas.drawSprite(
-          "parts/red-" + part.prototype.image,
-          [0, 0],
-          [-1, 1],
-          0,
-          commander.color
-        );
+        baseAtlas.drawSprite("parts/gray-" + part.prototype.image, [0, 0], [-1, 1], 0, white);
+        baseAtlas.drawSprite("parts/red-" + part.prototype.image, [0, 0], [-1, 1], 0, commander.color);
       } else if (part.prototype.decal) {
-        baseAtlas.drawSprite(
-          "parts/" + part.prototype.image,
-          [0, 0],
-          [-1, 1],
-          0,
-          commander.color
-        );
+        baseAtlas.drawSprite("parts/" + part.prototype.image, [0, 0], [-1, 1], 0, commander.color);
       } else if (part.prototype.vblock) {
         vscale = part.prototype.vscale;
-        baseAtlas.drawSprite(
-          "vparts/" + part.prototype.image,
-          [0, 0],
-          [-vscale, vscale],
-          0,
-          white
-        );
+        baseAtlas.drawSprite("vparts/" + part.prototype.image, [0, 0], [-vscale, vscale], 0, white);
       } else if (part.prototype.vturret) {
         vscale = part.prototype.vscale;
         vimage = part.prototype.image;
-        if (part.prototype.has_ready)
-          vimage = part.prototype.image.replace("reload.png", "ready.png");
-        baseAtlas.drawSprite(
-          "vparts/" + vimage,
-          [0, 0],
-          [-vscale, vscale],
-          0,
-          white
-        );
-        baseAtlas.drawSprite(
-          "vparts/" + part.prototype.image.replace("reload.png", "bloom.png"),
-          [0, 0],
-          [-vscale, vscale],
-          0,
-          commander.color
-        );
+        if (part.prototype.has_ready) vimage = part.prototype.image.replace("reload.png", "ready.png");
+        baseAtlas.drawSprite("vparts/" + vimage, [0, 0], [-vscale, vscale], 0, white);
+        baseAtlas.drawSprite("vparts/" + part.prototype.image.replace("reload.png", "bloom.png"), [0, 0], [-vscale, vscale], 0, commander.color);
       } else {
-        baseAtlas.drawSprite(
-          "parts/" + part.prototype.image,
-          [0, 0],
-          [-1, 1],
-          0,
-          white
-        );
+        baseAtlas.drawSprite("parts/" + part.prototype.image, [0, 0], [-1, 1], 0, white);
       }
       baseAtlas.finishSprites(false);
       imageDataUrl = baseAtlas.endOffscreenFrame();
@@ -736,11 +579,7 @@
       designMode.select(buildBar.selected);
       designMode.fresh = false;
     }
-    if (
-      sim.galaxyStar &&
-      commander.galaxyDifficulty !== "captain" &&
-      commander.galaxyDifficulty !== "admiral"
-    ) {
+    if (sim.galaxyStar && commander.galaxyDifficulty !== "captain" && commander.galaxyDifficulty !== "admiral") {
       designMode.aiEdit = false;
       designMode.showAiTools = false;
     } else {
@@ -911,10 +750,7 @@
   };
 
   finishDesignButton = function () {
-    if (
-      !hasIssue(commander, designMode.unit.spec) &&
-      designMode.draggingPart === null
-    ) {
+    if (!hasIssue(commander, designMode.unit.spec) && designMode.draggingPart === null) {
       return div(function () {
         var quarterWidth;
         quarterWidth = window.innerWidth / 4;
@@ -1028,7 +864,7 @@
   };
 
   window.unitInfoSmall = function (spec, valid) {
-    var ghostCopy, j, len, part, ref, u;
+    var u;
     if (valid == null) {
       valid = true;
     }
@@ -1045,29 +881,10 @@
       });
       return;
     }
-    ghostCopy = false;
-    ref = u.parts;
-    for (j = 0, len = ref.length; j < len; j++) {
-      part = ref[j];
-      if (part.ghostCopy) {
-        ghostCopy = true;
-        break;
-      }
-    }
-    if (false && !ghostCopy && !valid) {
-      div(function () {
-        text_align("center");
-        return text("Click here to fix the design");
-      });
-      return;
-    }
     div(function () {
       text_align("center");
       padding_bottom(15);
-      if (ghostCopy) {
-        color("#f39c12");
-        text("Copy Only");
-      } else if (!u.name) {
+      if (!u.name) {
         text("Build Unit");
       } else {
         text(u.name);
@@ -1076,27 +893,17 @@
     });
 
     var unitCostLimit = sim.costLimit + u.limitBonus;
-    var buildCostAccu = Math.ceil(
-      u.cost <= unitCostLimit
-        ? u.cost
-        : u.cost * (0.5 + (0.5 * u.cost) / unitCostLimit)
-    );
+    var buildCostAccu = Math.ceil(u.cost <= unitCostLimit ? u.cost : u.cost * (0.5 + (0.5 * u.cost) / unitCostLimit));
 
     cell("cost.png", "$" + buildCostAccu);
-    cell(
-      "stripes.png",
-      hasIssueUnit(commander, u) === null ? "Valid" : "Invalid"
-    );
+    cell("stripes.png", hasIssueUnit(commander, u) === null ? "Valid" : "Invalid");
 
     cell("dps.png", (16 * u.weaponDPS).toFixed(1) + "dps");
     cell("armor.png", u.hp.toFixed(0) + "HP");
     cell("range.png", u.weaponRange.toFixed(0) + "m");
     cell("speed.png", (u.maxSpeed * 16).toFixed(1) + "m/s");
     cell("arc.png", u.weaponArc + "&deg;");
-    cell(
-      "turnSpeed.png",
-      (((u.turnSpeed * 16) / Math.PI) * 180).toFixed(1) + "&deg;/s"
-    );
+    cell("turnSpeed.png", (((u.turnSpeed * 16) / Math.PI) * 180).toFixed(1) + "&deg;/s");
     return powerBar(u);
   };
 
@@ -1162,8 +969,7 @@
           text("Name your ship");
           return onmouseover(function (e) {
             designMode.smallTipBounds = e.target.getBoundingClientRect();
-            return (designMode.smallTip =
-              "Naming your ships is a bonus feature <br> and requires the Paint Job DLC.");
+            return (designMode.smallTip = "Naming your ships is a bonus feature <br> and requires the Paint Job DLC.");
           });
         });
       }
@@ -1173,14 +979,8 @@
         padding_left(20);
 
         var unitCostLimit = sim.costLimit + u.limitBonus;
-        var buildCostAccu = Math.ceil(
-          u.cost <= unitCostLimit
-            ? u.cost
-            : u.cost * (0.5 + (0.5 * u.cost) / unitCostLimit)
-        );
-        var overnormal = (
-          u.cost > unitCostLimit ? (100 * buildCostAccu) / u.cost : 100
-        ).toFixed(2);
+        var buildCostAccu = Math.ceil(u.cost <= unitCostLimit ? u.cost : u.cost * (0.5 + (0.5 * u.cost) / unitCostLimit));
+        var overnormal = (u.cost > unitCostLimit ? (100 * buildCostAccu) / u.cost : 100).toFixed(2);
 
         div(function () {
           font_size(10.5);
@@ -1192,45 +992,20 @@
           });
           return margin_bottom(10);
         });
-
-        //cell("cost.png", "$" + buildCostAccu, "build cost of unit");
-        //cell("build.png", overnormal + "%", "of total parts cost");
-        //cell("stripes.png", "$" + unitCostLimit, "build cost limit of unit");
         cell("count.png", u.parts.length, "parts on unit");
         cell("count.png", u.aiRules.length, "ai rules on unit");
 
-        cell(
-          "dps.png",
-          (16 * u.weaponDPS).toFixed(1) + "dps",
-          "damage per second from all weapons"
-        );
+        cell("dps.png", (16 * u.weaponDPS).toFixed(1) + "dps", "damage per second from all weapons");
         cell("armor.png", u.hp.toFixed(0) + "HP", "total armor hit points");
         if (u.shield) {
           cell("shield.png", u.shield + "sh", "+ shield hit points");
         }
-        cell(
-          "range.png",
-          u.weaponRange.toFixed(0) + "m",
-          "max range of weapons"
-        );
-        cell(
-          "speed.png",
-          (u.maxSpeed * 16).toFixed(1) + "m/s",
-          "max unit move speed"
-        );
+        cell("range.png", u.weaponRange.toFixed(0) + "m", "max range of weapons");
+        cell("speed.png", (u.maxSpeed * 16).toFixed(1) + "m/s", "max unit move speed");
         if (u.jumpDistance) {
-          cell(
-            "jump.png",
-            u.jumpDistance.toFixed(0) + "m",
-            "jump distance (in meters)"
-          );
+          cell("jump.png", u.jumpDistance.toFixed(0) + "m", "jump distance (in meters)");
         }
-        cell("arc.png", u.weaponArc + "&deg;", "max arc of weapons");
-        cell(
-          "turnSpeed.png",
-          (((u.turnSpeed * 16) / Math.PI) * 180).toFixed(1) + "&deg;/s",
-          "turn rate"
-        );
+        cell("turnSpeed.png", (((u.turnSpeed * 16) / Math.PI) * 180).toFixed(1) + "&deg;/s", "turn rate");
         cell("mass.png", u.mass.toFixed(1) + "T", "ship total mass");
         cell("arc360.png", u.radius.toFixed(1) + "m", "ship size");
         // map weapons
@@ -1246,40 +1021,16 @@
         });
         if (u.fireEnergy) {
           divider_small();
-          cell(
-            "window.png",
-            ((u.weaponDPS * u.hp) / u.cost).toFixed(2) + " brawl ",
-            "value"
-          );
-          cell(
-            "fullscreen.png",
-            (u.burst / u.weapons.length / 10).toFixed(2) + " burst ",
-            "value"
-          );
+          cell("window.png", ((u.weaponDPS * u.hp) / u.cost).toFixed(2) + " brawl ", "value");
+          cell("fullscreen.png", (u.burst / u.weapons.length / 10).toFixed(2) + " burst ", "value");
           cell("energyFire.png", u.burst.toFixed(1) + " burst", " dmg");
         }
         divider_small();
         powerBar(u);
-        cell(
-          "energyGen.png",
-          "+" + (u.genEnergy * 16).toFixed(0) + "E",
-          "energy generated per second"
-        );
-        cell(
-          "energyMove.png",
-          (u.moveEnergy * 16).toFixed(0) + "E",
-          "energy needed to move per second"
-        );
-        cell(
-          "energyStorage.png",
-          u.storeEnergy.toFixed(0) + "E",
-          "battery capacity"
-        );
-        cell(
-          "energyFire.png",
-          (u.fireEnergy * 16).toFixed(0) + "E",
-          "energy needed to fire all weapons per second"
-        );
+        cell("energyGen.png", "+" + (u.genEnergy * 16).toFixed(0) + "E", "energy generated per second");
+        cell("energyMove.png", (u.moveEnergy * 16).toFixed(0) + "E", "energy needed to move per second");
+        cell("energyStorage.png", u.storeEnergy.toFixed(0) + "E", "battery capacity");
+        cell("energyFire.png", (u.fireEnergy * 16).toFixed(0) + "E", "energy needed to fire all weapons per second");
         divider_small();
         // map parts
         u.shield_energy = 0;
@@ -1302,35 +1053,13 @@
               break;
           }
         });
-        if (u.shield_energy)
-          cell(
-            "shield.png",
-            u.shield_energy + "-E",
-            "energy needed to regen shields per second"
-          );
-        if (u.weapon_energy)
-          cell(
-            "damage.png",
-            (u.weapon_energy * 16).toFixed(0) + "-E",
-            "energy needed to fire weapons per second"
-          );
-        if (u.cloak_energy)
-          cell("cloak.png", u.cloak_energy + "-E", "energy needed to cloak");
-        if (u.cloak_count)
-          cell(
-            "cloak.png",
-            (u.mass / (168 * u.cloak_count)).toFixed(2) + "s",
-            "time to cloak"
-          );
+        if (u.shield_energy) cell("shield.png", u.shield_energy + "-E", "energy needed to regen shields per second");
+        if (u.weapon_energy) cell("damage.png", (u.weapon_energy * 16).toFixed(0) + "-E", "energy needed to fire weapons per second");
+        if (u.cloak_energy) cell("cloak.png", u.cloak_energy + "-E", "energy needed to cloak");
+        if (u.cloak_count) cell("cloak.png", (u.mass / (168 * u.cloak_count)).toFixed(2) + "s", "time to cloak");
 
-        if (u.jump_energy)
-          cell("jump.png", u.jump_energy + "-E", "energy needed to jump");
-        if (u.pd_energy)
-          cell(
-            "antiMissle.png",
-            (u.pd_energy * 16).toFixed(0) + "-E",
-            "energy needed to fire all PD per second"
-          );
+        if (u.jump_energy) cell("jump.png", u.jump_energy + "-E", "energy needed to jump");
+        if (u.pd_energy) cell("antiMissle.png", (u.pd_energy * 16).toFixed(0) + "-E", "energy needed to fire all PD per second");
         divider_small();
         u.weapons.sort(function (a, b) {
           return b.dps - a.dps;
@@ -1414,10 +1143,7 @@
       );
       w = 150;
       s = 160;
-      max = Math.max(
-        Math.max(s * u.genEnergy, u.storeEnergy),
-        s * u.moveEnergy + s * u.fireEnergy + s * u.shield_energy
-      );
+      max = Math.max(Math.max(s * u.genEnergy, u.storeEnergy), s * u.moveEnergy + s * u.fireEnergy + s * u.shield_energy);
       div(function () {
         position("absolute");
         top(3);
@@ -1493,14 +1219,7 @@
       text(
         typeof w.pos === "undefined" || typeof w.unit === "undefined"
           ? "Preview"
-          : "#" +
-              w.unit.parts.indexOf(w) +
-              " pos: " +
-              w.pos +
-              " dir: " +
-              w.dir +
-              " flip: " +
-              (w.pos[0] < 0 && w.flip ? "-1" : "+1")
+          : "#" + w.unit.parts.indexOf(w) + " pos: " + w.pos + " dir: " + w.dir + " flip: " + (w.pos[0] < 0 && w.flip ? "-1" : "+1")
       );
       return margin_bottom(extra ? 0 : 10);
     });
@@ -1517,34 +1236,18 @@
     dps = w.dps || w.damage / rt;
     cell("dps.png", (16 * dps).toFixed(1) + "dps", "damage per second");
     if ((ref = w.bulletCls) != null ? ref.prototype.hitsMultiple : void 0) {
-      cell(
-        "multihit.png",
-        "MultiHit",
-        "passes through and hits multiple ships"
-      );
+      cell("multihit.png", "MultiHit", "passes through and hits multiple ships");
     }
     cell("damage.png", w.damage.toFixed(1) + "d", "damage per shot");
     cell("range.png", w.range.toFixed(1) + "m", "weapon range");
     cell("reload.png", (w.reloadTime / 16).toFixed(2) + "s", "reload time");
     cell("energy.png", "-" + w.shotEnergy.toFixed(1) + "E", "energy per shot");
     if (w.fireEnergy) {
-      cell(
-        "energy.png",
-        "-" + (w.fireEnergy * 16).toFixed(1) + "E",
-        "energy per second"
-      );
+      cell("energy.png", "-" + (w.fireEnergy * 16).toFixed(1) + "E", "energy per second");
     }
     if (!w.instant) {
-      cell(
-        "speed.png",
-        (w.bulletSpeed * 16).toFixed(0) + "m/s",
-        "speed of the projectile"
-      );
-      cell(
-        "speed.png",
-        (w.range / (w.bulletSpeed * 16)).toFixed(2) + "s",
-        "time for projectile to hit max range"
-      );
+      cell("speed.png", (w.bulletSpeed * 16).toFixed(0) + "m/s", "speed of the projectile");
+      cell("speed.png", (w.range / (w.bulletSpeed * 16)).toFixed(2) + "s", "time for projectile to hit max range");
     }
     if (w.aoe) {
       cell("aoe.png", w.aoe + "m", "area of effect");
@@ -1562,30 +1265,14 @@
       cell("antiMissle.png", "PD", "points defence, can shoot down missiles");
     }
     if (w.energyDamage) {
-      cell(
-        "energyDamage.png",
-        ((16 * w.energyDamage) / rt).toFixed(1) + "dps",
-        "amount of energy drain per second"
-      );
+      cell("energyDamage.png", ((16 * w.energyDamage) / rt).toFixed(1) + "dps", "amount of energy drain per second");
     }
     if (w.energyDamage) {
-      cell(
-        "energyDamage.png",
-        w.energyDamage.toFixed(1) + "d",
-        "amount of energy drain per shot"
-      );
+      cell("energyDamage.png", w.energyDamage.toFixed(1) + "d", "amount of energy drain per shot");
     }
     if (w.dealsBurnDamage) {
-      cell(
-        "burnDps.png",
-        (16 * dps * w.burnAmount).toFixed(1) + "dps",
-        "burn damage per second"
-      );
-      cell(
-        "burnDamage.png",
-        (w.damage * w.burnAmount).toFixed(1) + "d",
-        "burn damage per shot"
-      );
+      cell("burnDps.png", (16 * dps * w.burnAmount).toFixed(1) + "dps", "burn damage per second");
+      cell("burnDamage.png", (w.damage * w.burnAmount).toFixed(1) + "d", "burn damage per shot");
       cell("burnDps.png", "3%", "of burn as damage per second");
     }
     if (w.minRange > 0) {
@@ -1655,11 +1342,7 @@
       }
       editorButton("img/ui/topbar/chat.png", "Hide hover info", function () {
         if (designMode.hideHoverInfo) {
-          background(
-            hasIssue(commander, designMode.unit.spec)
-              ? "rgba(255,0,0,.2)"
-              : "rgba(0,0,0,.2)"
-          );
+          background(hasIssue(commander, designMode.unit.spec) ? "rgba(255,0,0,.2)" : "rgba(0,0,0,.2)");
         }
         return onclick(function () {
           //designMode.hoverTipPart = null;
@@ -1687,32 +1370,22 @@
             return (designMode.hideBackground = !designMode.hideBackground);
           });
         });
-        editorButton(
-          "img/ui/build.png",
-          "Allows outside parts placement",
-          function () {
-            if (designMode.outsidePartsPlacement) {
-              background("rgba(0,0,0,.2)");
-            }
-            return onclick(function () {
-              return (designMode.outsidePartsPlacement =
-                !designMode.outsidePartsPlacement);
-            });
+        editorButton("img/ui/build.png", "Allows outside parts placement", function () {
+          if (designMode.outsidePartsPlacement) {
+            background("rgba(0,0,0,.2)");
           }
-        );
-        editorButton(
-          "img/ui/armor2.png",
-          "Allows overlap parts placement",
-          function () {
-            if (designMode.overlapPartsPlacement) {
-              background("rgba(0,0,0,.2)");
-            }
-            return onclick(function () {
-              return (designMode.overlapPartsPlacement =
-                !designMode.overlapPartsPlacement);
-            });
+          return onclick(function () {
+            return (designMode.outsidePartsPlacement = !designMode.outsidePartsPlacement);
+          });
+        });
+        editorButton("img/ui/armor2.png", "Allows overlap parts placement", function () {
+          if (designMode.overlapPartsPlacement) {
+            background("rgba(0,0,0,.2)");
           }
-        );
+          return onclick(function () {
+            return (designMode.overlapPartsPlacement = !designMode.overlapPartsPlacement);
+          });
+        });
         editorButton("img/ui/decloak.png", "Show hidden parts", function () {
           if (designMode.showHiddenParts) {
             background("rgba(0,0,0,.2)");
@@ -1894,11 +1567,7 @@
             div(function () {
               font_size(16);
               color("rgba(255,255,255,.5)");
-              raw(
-                "Support Istrolid and get this part with the <a href='http://store.steampowered.com/app/449140' target='_blank'>" +
-                  part.dlc +
-                  " DLC</a>."
-              );
+              raw("Support Istrolid and get this part with the <a href='http://store.steampowered.com/app/449140' target='_blank'>" + part.dlc + " DLC</a>.");
               return margin_bottom(10);
             });
           }
@@ -1912,17 +1581,9 @@
             font_size(10.5);
             color("rgba(255,255,255,.5)");
             text(
-              typeof part.pos === "undefined" ||
-                typeof part.unit === "undefined"
+              typeof part.pos === "undefined" || typeof part.unit === "undefined"
                 ? "Preview"
-                : "#" +
-                    part.unit.parts.indexOf(part) +
-                    " pos: " +
-                    part.pos +
-                    " dir: " +
-                    part.dir +
-                    " flip: " +
-                    (part.pos[0] < 0 && part.flip ? "-1" : "+1")
+                : "#" + part.unit.parts.indexOf(part) + " pos: " + part.pos + " dir: " + part.dir + " flip: " + (part.pos[0] < 0 && part.flip ? "-1" : "+1")
             );
             return margin_bottom(0);
           });
@@ -1936,25 +1597,13 @@
             cell("mass.png", part.mass.toFixed(1) + "T", "mass");
           }
           if (part.thrust) {
-            cell(
-              "speed.png",
-              (part.thrust * 16).toFixed(0) + "kN",
-              "thrust (in kilonewtons)"
-            );
+            cell("speed.png", (part.thrust * 16).toFixed(0) + "kN", "thrust (in kilonewtons)");
           }
           if (part.turnSpeed) {
-            cell(
-              "turnSpeed.png",
-              ((part.turnSpeed / Math.PI) * 180).toFixed(0) + "&deg;/s",
-              "+ turn speed (slowed down by mass)"
-            );
+            cell("turnSpeed.png", ((part.turnSpeed / Math.PI) * 180).toFixed(0) + "&deg;/s", "+ turn speed (slowed down by mass)");
           }
           if (part.jumpCount) {
-            cell(
-              "jump.png",
-              (part.jumpCount * 500).toFixed(0) + "m",
-              "jump distance (in meters)"
-            );
+            cell("jump.png", (part.jumpCount * 500).toFixed(0) + "m", "jump distance (in meters)");
           }
           pr = function (percent) {
             if (percent > 0) {
@@ -1982,53 +1631,29 @@
             cell("energy.png", pr(part.weaponEnergy), "energy usage");
           }
           if (part.adjacent) {
-            cell(
-              "stripes.png",
-              "-15%",
-              "reduced effectiveness per additional adjacent weapon"
-            );
+            cell("stripes.png", "-15%", "reduced effectiveness per additional adjacent weapon");
           }
           if (part.genShield) {
-            cell(
-              "shield.png",
-              "+" + part.genShield * 16 + "sh/s",
-              "recharges shield"
-            );
+            cell("shield.png", "+" + part.genShield * 16 + "sh/s", "recharges shield");
           }
           if (part.shield) {
             cell("shield.png", part.shield + "sh", "+ shield hit points");
           }
           if (part.energyLine) {
-            cell(
-              "energyStorage.png",
-              part.energyLine * 100 + "%",
-              "energy storage threshold for regeneration"
-            );
+            cell("energyStorage.png", part.energyLine * 100 + "%", "energy storage threshold for regeneration");
           }
           if (part.range) {
             cell("range.png", part.range + "m", "range");
           }
           if (part.trasferEnergy) {
-            cell(
-              "energy.png",
-              "-" + part.trasferEnergy * 16 + "E/s",
-              "amount transfer per second per ship"
-            );
+            cell("energy.png", "-" + part.trasferEnergy * 16 + "E/s", "amount transfer per second per ship");
           }
           if (part.slow) {
-            cell(
-              "speed.png",
-              "-" + part.slow * 20 + "%",
-              "Slows down ships in range"
-            );
+            cell("speed.png", "-" + part.slow * 20 + "%", "Slows down ships in range");
             cell("decloak.png", "Decloaks", "units in range");
           }
           if (part.genCloak) {
-            cell(
-              "cloak.png",
-              "+" + part.genCloak * 16 * 2 + "T/s",
-              "mass cloaked per second"
-            );
+            cell("cloak.png", "+" + part.genCloak * 16 * 2 + "T/s", "mass cloaked per second");
             cell("cloakMass.png", part.genCloak * 16 * 5 + "T", "while moving");
           }
           if (part.explodes) {
@@ -2039,29 +1664,17 @@
               cell("range.png", part.aoe + "m", "area of effect");
             }
             if (part.energyDamage) {
-              cell(
-                "energyDamage.png",
-                part.energyDamage + "d",
-                "amount of energy drain per explosion"
-              );
+              cell("energyDamage.png", part.energyDamage + "d", "amount of energy drain per explosion");
             }
           }
           if (part.genEnergy) {
-            cell(
-              "energyGen.png",
-              "+" + part.genEnergy * 16 + "E",
-              "generates energy"
-            );
+            cell("energyGen.png", "+" + part.genEnergy * 16 + "E", "generates energy");
           }
           if (part.storeEnergy) {
             cell("energyStorage.png", part.storeEnergy + "E", "stores energy");
           }
           if (part.useEnergy) {
-            cell(
-              "energy.png",
-              "-" + part.useEnergy * 16 + "E/s",
-              "uses energy"
-            );
+            cell("energy.png", "-" + part.useEnergy * 16 + "E/s", "uses energy");
           }
           if (part.arc) {
             cell("arc.png", part.arc + "°", "firing arc");
@@ -2070,11 +1683,7 @@
             cell("range.png", pr(-100 + part.rangeBuffMul * 100), "range");
           }
           if (part.burnAmount) {
-            cell(
-              "burnDamage.png",
-              (part.damage * part.burnAmount).toFixed(1) + "d",
-              "burn damage per warhead"
-            );
+            cell("burnDamage.png", (part.damage * part.burnAmount).toFixed(1) + "d", "burn damage per warhead");
             return cell("burnDps.png", "3%", "of burn as damage per second");
           }
         });
@@ -2266,10 +1875,7 @@
       if (part.prototype.hide || part.prototype.disable) {
         return;
       }
-      if (
-        part.prototype.faction &&
-        part.prototype.faction !== commander.faction
-      ) {
+      if (part.prototype.faction && part.prototype.faction !== commander.faction) {
         return;
       }
     }

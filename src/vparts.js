@@ -171,24 +171,19 @@ Part.prototype.draw = function () {
   if (this.unit.cloakFade > 0) {
     alpha = 255 - this.unit.cloakFade * 200;
   }
-  if (this.ghostCopy) {
-    alpha = 170;
-  }
   if (this.vblock) {
-    if (this.pos[0] < 0 && this.flip) flip = -this.vscale;
-    else flip = this.vscale;
+    if (this.pos[0] < 0) flip = this.vscale;
+    else flip = -this.vscale;
     return baseAtlas.drawSprite("vparts/" + this.image, this.worldPos, [flip, -this.vscale], rot, [255, 255, 255, alpha]);
   } //
   else if (this.vturret) {
     c = this.unit.color;
-    if (this.pos[0] < 0 && this.flip) flip = -this.vscale;
-    else flip = this.vscale;
+    if (this.pos[0] < 0) flip = this.vscale;
+    else flip = -this.vscale;
     if (this.has_ready && this.working) baseAtlas.drawSprite("vparts/" + this.image.replace("reload.png", "ready.png"), this.worldPos, [flip, -this.vscale], rot, [255, 255, 255, alpha]);
     else baseAtlas.drawSprite("vparts/" + this.image, this.worldPos, [flip, -this.vscale], rot, [255, 255, 255, alpha]);
     if (this.working) return baseAtlas.drawSprite("vparts/" + this.image.replace("reload.png", "bloom.png"), this.worldPos, [flip, -this.vscale], rot, [c[0], c[1], c[2], alpha * this.opacity]);
-  }
-
-  if (this.stripe) {
+  } else if (this.stripe) {
     baseAtlas.drawSprite("parts/gray-" + this.image, this.worldPos, [flip, -1], rot, [255, 255, 255, alpha]);
     c = this.unit.color;
     return baseAtlas.drawSprite("parts/red-" + this.image, this.worldPos, [flip, -1], rot, [c[0], c[1], c[2], alpha]);
@@ -210,11 +205,13 @@ Turret.prototype.draw = function () {
   return Turret.__super__.draw.call(this);
 };
 
+parts["Mount180"].prototype.image = "mount200.png";
+
 parts["RingTurret"].prototype.draw = function () {
   if (this.working) {
-    this.spin += 0.01 * this.damage;
-  } else {
     this.spin += 0.001 * this.damage;
+  } else {
+    this.spin += 0.0001 * this.damage;
   }
   Turret.__super__.draw.call(this);
   c = this.unit.color;
@@ -222,7 +219,7 @@ parts["RingTurret"].prototype.draw = function () {
   if (this.unit.cloakFade > 0) {
     alpha = 255 - this.unit.cloakFade * 200;
   }
-  return baseAtlas.drawSprite("parts/" + "fizzleMineEnergy.png", this.worldPos, [1.2, 1.2], this.spin, [255, 255, 255, alpha]);
+  return baseAtlas.drawSprite("parts/" + "fireRing.png", this.worldPos, [0.5, 0.5], this.spin, [255, 255, 255, alpha]);
 };
 
 parts["TeslaTurret"].prototype.spriteIndex = 0;

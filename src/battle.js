@@ -1041,9 +1041,6 @@
         spec = unit.spec;
         copy = new types.Unit(spec);
         copy.aiRules = [];
-        if (!sim.local && window.location.href.indexOf("gamedev.html") === -1 && unit.owner !== commander.number) {
-          copy.ghostCopy = true;
-        }
         buildBar.setSpec(index, copy.toSpec());
         return control.savePlayer();
       }

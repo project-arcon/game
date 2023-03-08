@@ -6,7 +6,7 @@
 
   canvas = void 0;
 
-  dpr = window.devicePixelRatio;
+  dpr = 2;
 
   window.Atlas = (function () {
     function Atlas(params) {

@@ -23,7 +23,8 @@
     return ui.path[0] === "design" || ui.path[0] === "fleet";
   };
 
-  ui.topButton = function (mode, fn) {
+  ui.topButton = function (mode, fn, icon) {
+    if (!icon) icon = mode;
     return div(".hover-black", function () {
       display("inline-block");
       height(64);
@@ -31,7 +32,7 @@
       position("relative");
       img(
         {
-          src: "img/ui/topbar/" + mode + ".png",
+          src: "img/ui/topbar/" + icon + ".png",
           width: 44,
           height: 44,
         },
@@ -120,21 +121,15 @@
         });
       });
     } else {
-      ui.topButton("restart", function () {
-        if (ui.rejoinServerOn) {
-          background("rgba(255,0,0,.6)");
-        }
-        onclick(function () {
-          ui.rejoinServerOn = !ui.rejoinServerOn;
-          return setTimeout(function () {
-            return (ui.rejoinServerOn = false);
-          }, 200);
-        });
-        ondblclick(function () {
-          battleMode.rejoinServer();
-          return (ui.rejoinServerOn = false);
-        });
-      });
+      ui.topButton(
+        "reconnect",
+        function () {
+          return onclick(function () {
+            return battleMode.rejoinServer();
+          });
+        },
+        "restart"
+      );
     }
     ui.topButton("chat", function () {
       if (ui.chatToggle) {

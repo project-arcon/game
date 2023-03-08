@@ -387,15 +387,10 @@
     };
     return div(function () {
       background_color("rgba(0,0,0,.1)");
-      if (!sim.local) {
-        modeButton("1v1");
-        //modeButton("1v1r");
-        //modeButton("1v1t");
-        modeButton("2v2");
-        modeButton("3v3");
-      } else {
-        modeButton("Sandbox", "sandbox");
-      }
+      modeButton("1v1");
+      modeButton("2v2");
+      modeButton("3v3");
+      modeButton("Sandbox", "sandbox");
       return modeButton("Survival", "survival");
     });
   };
