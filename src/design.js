@@ -127,15 +127,10 @@
       if (way == null) {
         way = 1;
       }
-      if (account.hasDLCBonus()) {
-        if (part.canRotate) {
-          part.dir = (4 + part.dir + way) % 4;
-        } else {
-          this.wiggle = 10 * way;
-        }
+      if (part.canRotate) {
+        part.dir = (4 + part.dir + way) % 4;
       } else {
         this.wiggle = 10 * way;
-        part.dir = 0;
       }
       return part;
     };
@@ -937,42 +932,25 @@
       color("#DDD");
       overflow_x("hidden");
       overflow_y("auto");
-      if (account.hasDLCBonus()) {
-        input(
-          {
-            placeholder: "Name your ship",
-            value: designMode.unit.name,
-          },
-          function () {
-            display("block");
-            background_color("rgba(0,0,0,.4)");
-            border("none");
-            width(240);
-            padding(10);
-            font_size(16);
-            color("white");
-            return oninput(function (e) {
-              designMode.unit.name = e.target.value;
-              return designMode.save();
-            });
-          }
-        );
-      } else {
-        div(function () {
+      input(
+        {
+          placeholder: "Name your ship",
+          value: designMode.unit.name,
+        },
+        function () {
           display("block");
           background_color("rgba(0,0,0,.4)");
           border("none");
           width(240);
           padding(10);
           font_size(16);
-          color("rgba(255,255,255,.1)");
-          text("Name your ship");
-          return onmouseover(function (e) {
-            designMode.smallTipBounds = e.target.getBoundingClientRect();
-            return (designMode.smallTip = "Naming your ships is a bonus feature <br> and requires the Paint Job DLC.");
+          color("white");
+          return oninput(function (e) {
+            designMode.unit.name = e.target.value;
+            return designMode.save();
           });
-        });
-      }
+        }
+      );
       return div(function () {
         var j, len, ref, results, w;
         padding(10);
@@ -1563,14 +1541,6 @@
             //return margin_bottom(10);
             return margin_bottom(0);
           });
-          if (!account.hasDLC(part.dlc)) {
-            div(function () {
-              font_size(16);
-              color("rgba(255,255,255,.5)");
-              raw("Support Istrolid and get this part with the <a href='http://store.steampowered.com/app/449140' target='_blank'>" + part.dlc + " DLC</a>.");
-              return margin_bottom(10);
-            });
-          }
           div(function () {
             font_size(10.5);
             color("rgba(255,255,255,.5)");
@@ -1700,7 +1670,7 @@
   drawParts = function () {
     var minParts, p, totalParts;
     minParts = 3 * 8;
-    if (sim.galaxyStar && !account.DLCbonus) {
+    if (sim.galaxyStar) {
       totalParts = 0;
       for (p in galaxyMode.unlockedParts) {
         totalParts += 1;
@@ -1867,11 +1837,6 @@
 
   drawPart = function (clsName, part) {
     if (!designMode.showHiddenParts) {
-      if (sim.galaxyStar && !galaxyMode.unlockedParts[clsName]) {
-        if (!(part.prototype.dlc && account.hasDLC(part.prototype.dlc))) {
-          return;
-        }
-      }
       if (part.prototype.hide || part.prototype.disable) {
         return;
       }
@@ -1920,18 +1885,14 @@
       onmouseover(function (e) {
         return (designMode.hoverTipParts = [part.prototype]);
       });
-      if (!account.hasDLC(part.prototype.dlc)) {
-        return opacity(".5");
-      } else {
-        return onmousedown(function (e) {
-          designMode.draggingPart = new part();
-          designMode.draggingPart.unit = designMode.dragUnit;
-          v2.set(designMode.pos, designMode.draggingPart.worldPos);
-          v2.set(designMode.pos, designMode.draggingPart.pos);
-          designMode.dragUnit.parts = [designMode.draggingPart];
-          return e.preventDefault();
-        });
-      }
+      return onmousedown(function (e) {
+        designMode.draggingPart = new part();
+        designMode.draggingPart.unit = designMode.dragUnit;
+        v2.set(designMode.pos, designMode.draggingPart.worldPos);
+        v2.set(designMode.pos, designMode.draggingPart.pos);
+        designMode.dragUnit.parts = [designMode.draggingPart];
+        return e.preventDefault();
+      });
     });
   };
 

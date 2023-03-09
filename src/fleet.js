@@ -1,12 +1,29 @@
 // here begin src/fleet.js
-(function() {
-  var createTab, insertTab, isEmptyFleet, isEmptySpec, isEmptyTab, lockScreen, removeTab, renameTab, tabWidth, uniqueTabName, unitButton,
-    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+(function () {
+  var createTab,
+    insertTab,
+    isEmptyFleet,
+    isEmptySpec,
+    isEmptyTab,
+    lockScreen,
+    removeTab,
+    renameTab,
+    tabWidth,
+    uniqueTabName,
+    unitButton,
+    indexOf =
+      [].indexOf ||
+      function (item) {
+        for (var i = 0, l = this.length; i < l; i++) {
+          if (i in this && this[i] === item) return i;
+        }
+        return -1;
+      },
     slice = [].slice;
 
   eval(onecup["import"]());
 
-  window.getFleetKey = function(r, c, t) {
+  window.getFleetKey = function (r, c, t) {
     if (t === "default") {
       t = null;
     }
@@ -17,7 +34,7 @@
     }
   };
 
-  window.getAIKey = function(r, t) {
+  window.getAIKey = function (r, t) {
     if (t === "default") {
       t = null;
     }
@@ -28,9 +45,9 @@
     }
   };
 
-  window.fromFleetKey = function(key) {
+  window.fromFleetKey = function (key) {
     var col, ref, row, tab;
-    ref = key.split(","), row = ref[0], col = ref[1], tab = ref[2];
+    (ref = key.split(",")), (row = ref[0]), (col = ref[1]), (tab = ref[2]);
     if (isNaN(row) || isNaN(col)) {
       return [null, null, null];
     }
@@ -40,9 +57,9 @@
     return [+row, +col, tab];
   };
 
-  window.fromAIKey = function(key) {
+  window.fromAIKey = function (key) {
     var ref, row, tab;
-    ref = key.split(","), row = ref[0], tab = ref[1];
+    (ref = key.split(",")), (row = ref[0]), (tab = ref[1]);
     if (isNaN(row)) {
       return [null, null];
     }
@@ -52,7 +69,7 @@
     return [+row, tab];
   };
 
-  isEmptySpec = function(spec) {
+  isEmptySpec = function (spec) {
     if (!spec) {
       return true;
     }
@@ -70,7 +87,7 @@
     return false;
   };
 
-  isEmptyFleet = function(row, tab) {
+  isEmptyFleet = function (row, tab) {
     var i, j;
     if (commander.fleet.ais[getAIKey(row, tab)]) {
       return false;
@@ -83,12 +100,12 @@
     return true;
   };
 
-  isEmptyTab = function(tab) {
+  isEmptyTab = function (tab) {
     var c, k, r, ref, ref1, ref2, ref3, t, v;
     ref = commander.fleet.ais;
     for (k in ref) {
       v = ref[k];
-      ref1 = fromAIKey(k), r = ref1[0], t = ref1[1];
+      (ref1 = fromAIKey(k)), (r = ref1[0]), (t = ref1[1]);
       if (v && t === tab) {
         return false;
       }
@@ -96,7 +113,7 @@
     ref2 = commander.fleet;
     for (k in ref2) {
       v = ref2[k];
-      ref3 = fromFleetKey(k), r = ref3[0], c = ref3[1], t = ref3[2];
+      (ref3 = fromFleetKey(k)), (r = ref3[0]), (c = ref3[1]), (t = ref3[2]);
       if (t === tab && !isNaN(r) && !isEmptyFleet(r, t)) {
         return false;
       }
@@ -106,7 +123,7 @@
 
   tabWidth = 120;
 
-  window.FleetMode = (function() {
+  window.FleetMode = (function () {
     function FleetMode() {}
 
     FleetMode.prototype.focus = [0, 0];
@@ -119,16 +136,16 @@
 
     FleetMode.prototype.tabScrollAmount = 0;
 
-    FleetMode.prototype.onbuildclick = function(e, index) {
+    FleetMode.prototype.onbuildclick = function (e, index) {
       return e.preventDefault();
     };
 
-    FleetMode.prototype.tick = function() {
+    FleetMode.prototype.tick = function () {
       var dragger, trash;
       trash = onecup.lookup("#trash");
       if (fleetMode.draggingUnit) {
         dragger = onecup.lookup("#unit-dragger");
-        if ((dragger != null) && (trash != null)) {
+        if (dragger != null && trash != null) {
           dragger.style.left = control.mouse[0] - 84 / 2 + "px";
           dragger.style.top = control.mouse[1] - 84 / 2 + "px";
           if (control.mouse[0] < 100 || control.mouse[0] > window.innerWidth - 100) {
@@ -158,7 +175,7 @@
       return onecup.refresh();
     };
 
-    FleetMode.prototype.draw = function() {
+    FleetMode.prototype.draw = function () {
       var bg_zoom, z;
       bg_zoom = Math.max(window.innerWidth, window.innerHeight) / 128;
       z = bg_zoom * this.zoom;
@@ -169,20 +186,19 @@
     };
 
     return FleetMode;
-
   })();
 
-  window.moveFleet = function(from, to) {
+  window.moveFleet = function (from, to) {
     var i, j, keyF, keyT;
     for (i = j = 0; j < 10; i = ++j) {
       keyF = getFleetKey(from.row, i, from.tab);
       keyT = getFleetKey(to.row, i, to.tab);
       commander.fleet[keyT] = commander.fleet[keyF];
     }
-    return commander.fleet.ais[getAIKey(to.row, to.tab)] = commander.fleet.ais[getAIKey(from.row, from.tab)];
+    return (commander.fleet.ais[getAIKey(to.row, to.tab)] = commander.fleet.ais[getAIKey(from.row, from.tab)]);
   };
 
-  window.insertFleet = function(from, to, copy) {
+  window.insertFleet = function (from, to, copy) {
     var col, dir, empty, i, j, k, l, m, moving, n, ref, ref1, ref2, ref3, ref4, row, tab, v;
     if (copy == null) {
       copy = false;
@@ -217,7 +233,7 @@
       ref = commander.fleet;
       for (k in ref) {
         v = ref[k];
-        ref1 = fromFleetKey(k), row = ref1[0], col = ref1[1], tab = (ref2 = ref1[2]) != null ? ref2 : null;
+        (ref1 = fromFleetKey(k)), (row = ref1[0]), (col = ref1[1]), (tab = (ref2 = ref1[2]) != null ? ref2 : null);
         if (row === null || col === null) {
           continue;
         }
@@ -232,31 +248,37 @@
           }
         }
       }
-      insertFleet({
-        row: empty,
-        tab: to.tab
-      }, {
-        row: to.row,
-        tab: to.tab
-      });
+      insertFleet(
+        {
+          row: empty,
+          tab: to.tab,
+        },
+        {
+          row: to.row,
+          tab: to.tab,
+        }
+      );
       insertFleet(from, to, copy);
     } else {
       dir = Math.sign(to.row - from.row);
       moving = {
         name: commander.fleet.ais[getAIKey(from.row, from.tab)],
-        specs: []
+        specs: [],
       };
       for (i = l = 0; l < 10; i = ++l) {
         moving.specs[i] = commander.fleet[getFleetKey(from.row, i, from.tab)];
       }
       for (i = m = ref3 = from.row + dir, ref4 = to.row; ref3 <= ref4 ? m <= ref4 : m >= ref4; i = ref3 <= ref4 ? ++m : --m) {
-        moveFleet({
-          row: i,
-          tab: from.tab
-        }, {
-          row: i - dir,
-          tab: from.tab
-        });
+        moveFleet(
+          {
+            row: i,
+            tab: from.tab,
+          },
+          {
+            row: i - dir,
+            tab: from.tab,
+          }
+        );
       }
       commander.fleet.ais[getAIKey(to.row, to.tab)] = moving.name;
       for (i = n = 0; n < 10; i = ++n) {
@@ -266,7 +288,7 @@
     return control.savePlayer();
   };
 
-  window.removeFleet = function(row, tab) {
+  window.removeFleet = function (row, tab) {
     var c, i, j, k, lastRow, r, ref, ref1, ref2, ref3, t, v;
     if (tab == null) {
       tab = null;
@@ -275,7 +297,7 @@
     ref = commander.fleet;
     for (k in ref) {
       v = ref[k];
-      ref1 = fromFleetKey(k), r = ref1[0], c = ref1[1], t = ref1[2];
+      (ref1 = fromFleetKey(k)), (r = ref1[0]), (c = ref1[1]), (t = ref1[2]);
       if (r === null || c === null) {
         continue;
       }
@@ -286,20 +308,23 @@
       }
     }
     for (i = j = ref2 = row + 1, ref3 = lastRow + 1; ref2 <= ref3 ? j <= ref3 : j >= ref3; i = ref2 <= ref3 ? ++j : --j) {
-      moveFleet({
-        row: i,
-        tab: tab
-      }, {
-        row: i - 1,
-        tab: tab
-      });
+      moveFleet(
+        {
+          row: i,
+          tab: tab,
+        },
+        {
+          row: i - 1,
+          tab: tab,
+        }
+      );
     }
     if (commander.fleet.selection.row > row) {
-      return commander.fleet.selection.row -= 1;
+      return (commander.fleet.selection.row -= 1);
     }
   };
 
-  uniqueTabName = function(name) {
+  uniqueTabName = function (name) {
     var count, oldName;
     oldName = name;
     count = 1;
@@ -310,7 +335,7 @@
     return name.replace(",", "&#44;");
   };
 
-  createTab = function(name) {
+  createTab = function (name) {
     name = uniqueTabName(name);
     if (name && indexOf.call(commander.fleet.tabs, name) < 0) {
       commander.fleet.tabs.push(name);
@@ -319,7 +344,7 @@
     }
   };
 
-  insertTab = function(from, to) {
+  insertTab = function (from, to) {
     var fromIndex, tabs, toIndex;
     tabs = commander.fleet.tabs;
     fromIndex = tabs.indexOf(from);
@@ -328,7 +353,7 @@
     return account.rootSave();
   };
 
-  removeTab = function(tab) {
+  removeTab = function (tab) {
     var index;
     index = commander.fleet.tabs.indexOf(tab);
     commander.fleet.tabs.splice(index, 1);
@@ -344,7 +369,7 @@
     return account.rootSave();
   };
 
-  renameTab = function(from, to) {
+  renameTab = function (from, to) {
     var col, k, newKey, ref, ref1, ref2, ref3, row, tab, v;
     if (from === to) {
       return;
@@ -354,7 +379,7 @@
       ref = commander.fleet;
       for (k in ref) {
         v = ref[k];
-        ref1 = fromFleetKey(k), row = ref1[0], col = ref1[1], tab = ref1[2];
+        (ref1 = fromFleetKey(k)), (row = ref1[0]), (col = ref1[1]), (tab = ref1[2]);
         if (tab === from) {
           newKey = getFleetKey(row, col, to);
           commander.fleet[newKey] = v;
@@ -364,7 +389,7 @@
       ref2 = commander.fleet.ais;
       for (k in ref2) {
         v = ref2[k];
-        ref3 = fromAIKey(k), row = ref3[0], tab = ref3[1];
+        (ref3 = fromAIKey(k)), (row = ref3[0]), (tab = ref3[1]);
         if (tab === from) {
           newKey = getAIKey(row, to);
           commander.fleet.ais[newKey] = v;
@@ -380,11 +405,11 @@
     return account.rootSave();
   };
 
-  window.fleetUI = function() {
+  window.fleetUI = function () {
     if (!commander) {
       return;
     }
-    div(function() {
+    div(function () {
       position("absolute");
       top(0);
       left(0);
@@ -392,21 +417,21 @@
       z_index("3");
       return ui.topButton("menu");
     });
-    div(".hover-black", function() {
+    div(".hover-black", function () {
       position("absolute");
       bottom(0);
       left(0);
       z_index("3");
       return ui.barButton("design");
     });
-    div(function() {
+    div(function () {
       position("absolute");
       bottom(0);
       right(0);
       z_index("3");
       return ui.barButton("fleet");
     });
-    div(function() {
+    div(function () {
       position("absolute");
       top(0);
       right(0);
@@ -414,9 +439,9 @@
       img("#trash", {
         src: "img/ui/trash.png",
         width: 64,
-        height: 64
+        height: 64,
       });
-      return onmouseup(function() {
+      return onmouseup(function () {
         var i, j, ref, row, tab;
         if (fleetMode.draggingUnit) {
           playSound("sounds/ui/shake.wav");
@@ -424,7 +449,7 @@
           fleetMode.tick();
         }
         if (fleetMode.draggingFleet) {
-          ref = fleetMode.draggingFleet, row = ref.row, tab = ref.tab;
+          (ref = fleetMode.draggingFleet), (row = ref.row), (tab = ref.tab);
           if (!isEmptyFleet(row, fleetMode.currentTab)) {
             for (i = j = 0; j < 10; i = ++j) {
               commander.fleet[getFleetKey(row, i, tab)] = "";
@@ -436,7 +461,7 @@
         }
       });
     });
-    div("#fleet-screen", function() {
+    div("#fleet-screen", function () {
       text_align("center");
       overflow_y("scroll");
       position("absolute");
@@ -445,7 +470,7 @@
       right(0);
       top(0);
       bottom(0);
-      onmouseup(function() {
+      onmouseup(function () {
         if (fleetMode.draggingUnit) {
           if (control.mouse[0] < 100 || control.mouse[0] > window.innerWidth - 100) {
             fleetMode.draggingUnit = null;
@@ -465,19 +490,20 @@
         }
         return fleetMode.tick();
       });
-      div(function() {
+      div(function () {
         margin(20);
         text_align("center");
         color("white");
         return text("Drag and drop ships designs or select row for your build bar.");
       });
-      if (account.hasDLCBonus()) {
-        div(function() {
-          margin(20);
-          return input({
+      div(function () {
+        margin(20);
+        return input(
+          {
             type: "text",
-            placeholder: "search for ships"
-          }, function() {
+            placeholder: "search for ships",
+          },
+          function () {
             padding(10);
             font_size(16);
             width(300);
@@ -485,25 +511,25 @@
             color("white");
             border("none");
             text_align("center");
-            return oninput(function(e) {
-              return fleetMode.search = e.target.value;
+            return oninput(function (e) {
+              return (fleetMode.search = e.target.value);
             });
-          });
-        });
-      }
-      if ((commander.fleet.tabs == null) || commander.fleet.tabs.length === 0) {
+          }
+        );
+      });
+      if (commander.fleet.tabs == null || commander.fleet.tabs.length === 0) {
         commander.fleet.tabs = ["default"];
       }
-      if ((commander.fleet.selection == null) || typeof commander.fleet.selection !== "object") {
+      if (commander.fleet.selection == null || typeof commander.fleet.selection !== "object") {
         commander.fleet.selection = {
           row: 0,
-          tab: commander.fleet.tabs[0]
+          tab: commander.fleet.tabs[0],
         };
       }
       if (fleetMode.currentTab == null) {
         fleetMode.currentTab = commander.fleet.selection.tab;
       }
-      div("#fleet-tabs", function() {
+      div("#fleet-tabs", function () {
         var maxScroll;
         position("sticky");
         width(910);
@@ -516,7 +542,7 @@
         z_index("1");
         maxScroll = commander.fleet.tabs.length * tabWidth + fleetMode.newTab * tabWidth + 35 * 3 - 840;
         fleetMode.tabScrollAmount = Math.max(Math.min(fleetMode.tabScrollAmount, maxScroll), 0);
-        div(".hover-white-dark", function() {
+        div(".hover-white-dark", function () {
           position("absolute");
           left(0);
           width(35);
@@ -524,23 +550,23 @@
           if (isEmptyTab(fleetMode.currentTab)) {
             text("×");
             background_color("rgba(255,0,0,.6)");
-            return onclick(function() {
+            return onclick(function () {
               removeTab(fleetMode.currentTab);
               return account.rootSave();
             });
           } else {
             text("…");
-            return onclick(function() {
+            return onclick(function () {
               var editTab;
               if (fleetMode.editTab) {
                 editTab = lookup("#edit-tab");
                 if (editTab != null) {
                   renameTab(fleetMode.editTab, editTab.value);
                 }
-                return fleetMode.editTab = null;
+                return (fleetMode.editTab = null);
               } else {
                 fleetMode.editTab = fleetMode.currentTab;
-                return onecup.later(100, function() {
+                return onecup.later(100, function () {
                   editTab = lookup("#edit-tab");
                   if (editTab != null) {
                     editTab.focus();
@@ -552,18 +578,18 @@
           }
         });
         if (maxScroll > 0) {
-          div(".hover-white-dark", function() {
+          div(".hover-white-dark", function () {
             position("absolute");
             left(35);
             width(35);
             height(35);
             text("◀");
-            return onclick(function() {
-              return fleetMode.tabScrollAmount -= 40;
+            return onclick(function () {
+              return (fleetMode.tabScrollAmount -= 40);
             });
           });
         }
-        div("#tab-scroll", function() {
+        div("#tab-scroll", function () {
           var j, len, ref, tab, tabIndex, x;
           position("absolute");
           overflow("hidden");
@@ -575,7 +601,7 @@
             left(35);
             width(840);
           }
-          onwheel(function(e) {
+          onwheel(function (e) {
             fleetMode.tabScrollAmount += e.deltaY;
             return e.preventDefault();
           });
@@ -584,38 +610,42 @@
           for (tabIndex = j = 0, len = ref.length; j < len; tabIndex = ++j) {
             tab = ref[tabIndex];
             if (fleetMode.editTab === tab) {
-              input("#edit-tab", {
-                type: "text",
-                placeholder: "rename",
-                value: tab
-              }, function() {
-                position("absolute");
-                left(x);
-                x += tabWidth;
-                height(35);
-                width(tabWidth);
-                color("white");
-                border("none");
-                padding("0 10px");
-                font_size(16);
-                font_family("Arial", "Helvetica", "sans-serif");
-                text_align("center");
-                background_color("rgba(0,0,0,.6)");
-                onkeypress(function(e) {
-                  if (e.key === "Enter") {
-                    return e.target.blur();
-                  }
-                });
-                return onblur(function(e) {
-                  var name;
-                  name = e.target.value;
-                  renameTab(fleetMode.editTab, name);
-                  return fleetMode.editTab = null;
-                });
-              });
+              input(
+                "#edit-tab",
+                {
+                  type: "text",
+                  placeholder: "rename",
+                  value: tab,
+                },
+                function () {
+                  position("absolute");
+                  left(x);
+                  x += tabWidth;
+                  height(35);
+                  width(tabWidth);
+                  color("white");
+                  border("none");
+                  padding("0 10px");
+                  font_size(16);
+                  font_family("Arial", "Helvetica", "sans-serif");
+                  text_align("center");
+                  background_color("rgba(0,0,0,.6)");
+                  onkeypress(function (e) {
+                    if (e.key === "Enter") {
+                      return e.target.blur();
+                    }
+                  });
+                  return onblur(function (e) {
+                    var name;
+                    name = e.target.value;
+                    renameTab(fleetMode.editTab, name);
+                    return (fleetMode.editTab = null);
+                  });
+                }
+              );
               continue;
             }
-            div(".hover-white-dark", function() {
+            div(".hover-white-dark", function () {
               position("absolute");
               left(x);
               x += tabWidth;
@@ -629,34 +659,34 @@
               if (tab === fleetMode.currentTab) {
                 background_color("rgba(255,255,255,.5)");
               }
-              return (function(tab, tabIndex) {
+              return (function (tab, tabIndex) {
                 var switchTab;
-                switchTab = function() {
-                  return fleetMode.currentTab = tab;
+                switchTab = function () {
+                  return (fleetMode.currentTab = tab);
                 };
-                onmousedown(function(e) {
-                  if (e.buttons === 1 && !((fleetMode.draggingTab != null) || (fleetMode.draggingUnit != null) || (fleetMode.draggingFleet != null))) {
+                onmousedown(function (e) {
+                  if (e.buttons === 1 && !(fleetMode.draggingTab != null || fleetMode.draggingUnit != null || fleetMode.draggingFleet != null)) {
                     fleetMode.draggingTab = {
                       tab: tab,
-                      offset: control.mouse[0] - (35 + tabWidth * tabIndex - fleetMode.tabScrollAmount + (maxScroll > 0) * 35)
+                      offset: control.mouse[0] - (35 + tabWidth * tabIndex - fleetMode.tabScrollAmount + (maxScroll > 0) * 35),
                     };
                     return switchTab();
                   }
                 });
-                onmouseup(function(e) {
-                  if ((fleetMode.draggingTab != null) && fleetMode.draggingTab.tab !== tab) {
+                onmouseup(function (e) {
+                  if (fleetMode.draggingTab != null && fleetMode.draggingTab.tab !== tab) {
                     insertTab(fleetMode.draggingTab.tab, tab);
                   }
-                  return fleetMode.draggingTab = null;
+                  return (fleetMode.draggingTab = null);
                 });
-                onmouseover(function(e) {
+                onmouseover(function (e) {
                   if (fleetMode.draggingUnit || fleetMode.draggingFleet) {
                     return switchTab();
                   }
                 });
-                return ondblclick(function(e) {
+                return ondblclick(function (e) {
                   fleetMode.editTab = fleetMode.currentTab;
-                  return onecup.later(100, function() {
+                  return onecup.later(100, function () {
                     var editTab;
                     editTab = lookup("#edit-tab");
                     if (editTab != null) {
@@ -669,57 +699,61 @@
             });
           }
           if (fleetMode.newTab) {
-            input("#new-tab", {
-              type: "text",
-              placeholder: "new tab"
-            }, function() {
-              position("absolute");
-              left(x);
-              x += tabWidth;
-              height(35);
-              width(tabWidth);
-              color("white");
-              border("none");
-              padding("0 10px");
-              width(tabWidth);
-              font_size(16);
-              line_height(35);
-              text_align("center");
-              overflow("hidden");
-              background_color("rgba(0,0,0,.6)");
-              onkeypress(function(e) {
-                if (e.key === "Enter") {
-                  return e.target.blur();
-                }
-              });
-              return onblur(function(e) {
-                var name;
-                name = e.target.value;
-                createTab(name);
-                return fleetMode.newTab = false;
-              });
-            });
+            input(
+              "#new-tab",
+              {
+                type: "text",
+                placeholder: "new tab",
+              },
+              function () {
+                position("absolute");
+                left(x);
+                x += tabWidth;
+                height(35);
+                width(tabWidth);
+                color("white");
+                border("none");
+                padding("0 10px");
+                width(tabWidth);
+                font_size(16);
+                line_height(35);
+                text_align("center");
+                overflow("hidden");
+                background_color("rgba(0,0,0,.6)");
+                onkeypress(function (e) {
+                  if (e.key === "Enter") {
+                    return e.target.blur();
+                  }
+                });
+                return onblur(function (e) {
+                  var name;
+                  name = e.target.value;
+                  createTab(name);
+                  return (fleetMode.newTab = false);
+                });
+              }
+            );
           }
-          return div(".hover-white-dark", function() {
+          return div(".hover-white-dark", function () {
             position("absolute");
             left(x);
             height(35);
             width(35);
             overflow("hidden");
             text("+");
-            return onclick(function() {
+            return onclick(function () {
               var name;
               if (fleetMode.newTab) {
                 name = lookup("#new-tab").value;
                 createTab(name);
-                return fleetMode.newTab = false;
+                return (fleetMode.newTab = false);
               } else if (fleetMode.editTab) {
                 name = lookup("#edit-tab").value;
                 renameTab(fleetMode.editTab, name);
-                return fleetMode.editTab = null;
+                return (fleetMode.editTab = null);
               } else {
                 fleetMode.newTab = true;
-                return onecup.later(100, function() {
+                return onecup.later(100, function () {
                   var ref1;
                   fleetMode.tabScrollAmount = maxScroll + tabWidth;
                   return (ref1 = lookup("#new-tab")) != null ? ref1.focus() : void 0;
@@ -729,19 +763,19 @@
           });
         });
         if (maxScroll > 0) {
-          div(".hover-white-dark", function() {
+          div(".hover-white-dark", function () {
             position("absolute");
             right(35);
             height(35);
             width(35);
             text("▶");
-            return onclick(function() {
-              return fleetMode.tabScrollAmount += 40;
+            return onclick(function () {
+              return (fleetMode.tabScrollAmount += 40);
             });
           });
         }
         if (fleetMode.draggingTab) {
-          return div("#tab-dragger", function() {
+          return div("#tab-dragger", function () {
             var ref;
             position("absolute");
             width(tabWidth);
@@ -758,13 +792,13 @@
           });
         }
       });
-      return div("#fleet", function() {
+      return div("#fleet", function () {
         var c, j, k, nrows, r, ref, ref1, ref2, results, row, t, v;
         nrows = 6;
         ref = commander.fleet;
         for (k in ref) {
           v = ref[k];
-          ref1 = fromFleetKey(k), r = ref1[0], c = ref1[1], t = ref1[2];
+          (ref1 = fromFleetKey(k)), (r = ref1[0]), (c = ref1[1]), (t = ref1[2]);
           if (v && t === fleetMode.currentTab) {
             r = parseInt(r);
             if (r + 4 > nrows) {
@@ -774,129 +808,143 @@
         }
         results = [];
         for (row = j = 0, ref2 = nrows; 0 <= ref2 ? j < ref2 : j > ref2; row = 0 <= ref2 ? ++j : --j) {
-          results.push((function(row) {
-            return div(function() {
-              width("100%");
-              margin(0);
-              padding(0);
-              border("none");
-              onmousemove(function(e) {
-                if (e.buttons === 1) {
-                  return fleetMode.fleetDragover = row;
-                } else if (e.buttons === 0) {
-                  if (fleetMode.draggingUnit) {
-                    commander.fleet[fleetMode.draggingUnit.key] = fleetMode.draggingUnit.spec;
-                    fleetMode.draggingUnit = null;
+          results.push(
+            (function (row) {
+              return div(function () {
+                width("100%");
+                margin(0);
+                padding(0);
+                border("none");
+                onmousemove(function (e) {
+                  if (e.buttons === 1) {
+                    return (fleetMode.fleetDragover = row);
+                  } else if (e.buttons === 0) {
+                    if (fleetMode.draggingUnit) {
+                      commander.fleet[fleetMode.draggingUnit.key] = fleetMode.draggingUnit.spec;
+                      fleetMode.draggingUnit = null;
+                    }
+                    return (fleetMode.draggingFleet = null);
                   }
-                  return fleetMode.draggingFleet = null;
-                }
-              });
-              onmouseout(function(e) {
-                return fleetMode.fleetDragover = -1;
-              });
-              onmouseup(function(e) {
-                if (e.which === 1) {
-                  if ((fleetMode.draggingFleet != null) && (fleetMode.draggingFleet.copy || fleetMode.draggingFleet.row !== row || fleetMode.draggingFleet.tab !== fleetMode.currentTab)) {
-                    insertFleet(fleetMode.draggingFleet, {
-                      row: row,
-                      tab: fleetMode.currentTab
-                    }, fleetMode.draggingFleet.copy);
-                    fleetMode.draggingFleet = null;
-                    return playSound("sounds/ui/flick.wav");
+                });
+                onmouseout(function (e) {
+                  return (fleetMode.fleetDragover = -1);
+                });
+                onmouseup(function (e) {
+                  if (e.which === 1) {
+                    if (fleetMode.draggingFleet != null && (fleetMode.draggingFleet.copy || fleetMode.draggingFleet.row !== row || fleetMode.draggingFleet.tab !== fleetMode.currentTab)) {
+                      insertFleet(
+                        fleetMode.draggingFleet,
+                        {
+                          row: row,
+                          tab: fleetMode.currentTab,
+                        },
+                        fleetMode.draggingFleet.copy
+                      );
+                      fleetMode.draggingFleet = null;
+                      return playSound("sounds/ui/flick.wav");
+                    }
                   }
-                }
-              });
-              return div(function() {
-                var col, fleetAis, l;
-                position("relative");
-                height(84);
-                width(840);
-                margin("0px auto");
-                if (commander.fleet.selection.row === row && commander.fleet.selection.tab === fleetMode.currentTab) {
-                  background_color("rgba(255,255,255,.2)");
-                }
-                if (fleetMode.fleetDragover === row && fleetMode.draggingFleet) {
-                  if (fleetMode.draggingFleet.row > row || fleetMode.draggingFleet.tab !== fleetMode.currentTab) {
-                    box_shadow("0 -5px 0 rgba(155,255,155,.4)");
-                  } else if (fleetMode.draggingFleet.row < row) {
-                    box_shadow("0 5px 0 rgba(155,255,155,.4)");
-                  } else if (fleetMode.draggingFleet.copy) {
-                    background_color("rgba(155,255,155,.4)");
+                });
+                return div(function () {
+                  var col, fleetAis, l;
+                  position("relative");
+                  height(84);
+                  width(840);
+                  margin("0px auto");
+                  if (commander.fleet.selection.row === row && commander.fleet.selection.tab === fleetMode.currentTab) {
+                    background_color("rgba(255,255,255,.2)");
                   }
-                }
-                fleetAis = commander.fleet.ais || {};
-                for (col = l = 0; l < 10; col = ++l) {
-                  unitButton(getFleetKey(row, col, fleetMode.currentTab));
-                }
-                img(".hover-fade", {
-                  src: "img/ui/back.png",
-                  width: 40,
-                  height: 50
-                }, function() {
-                  position("absolute");
-                  top(15);
-                  right(-42);
-                  return onmousedown(function(e) {
-                    var i, m;
-                    if (e.altKey) {
-                      if (!isEmptyFleet(row, fleetMode.currentTab)) {
-                        for (i = m = 0; m < 10; i = ++m) {
-                          commander.fleet[getFleetKey(row, i, fleetMode.currentTab)] = "";
+                  if (fleetMode.fleetDragover === row && fleetMode.draggingFleet) {
+                    if (fleetMode.draggingFleet.row > row || fleetMode.draggingFleet.tab !== fleetMode.currentTab) {
+                      box_shadow("0 -5px 0 rgba(155,255,155,.4)");
+                    } else if (fleetMode.draggingFleet.row < row) {
+                      box_shadow("0 5px 0 rgba(155,255,155,.4)");
+                    } else if (fleetMode.draggingFleet.copy) {
+                      background_color("rgba(155,255,155,.4)");
+                    }
+                  }
+                  fleetAis = commander.fleet.ais || {};
+                  for (col = l = 0; l < 10; col = ++l) {
+                    unitButton(getFleetKey(row, col, fleetMode.currentTab));
+                  }
+                  img(
+                    ".hover-fade",
+                    {
+                      src: "img/ui/back.png",
+                      width: 40,
+                      height: 50,
+                    },
+                    function () {
+                      position("absolute");
+                      top(15);
+                      right(-42);
+                      return onmousedown(function (e) {
+                        var i, m;
+                        if (e.altKey) {
+                          if (!isEmptyFleet(row, fleetMode.currentTab)) {
+                            for (i = m = 0; m < 10; i = ++m) {
+                              commander.fleet[getFleetKey(row, i, fleetMode.currentTab)] = "";
+                            }
+                            delete commander.fleet.ais[getAIKey(row, fleetMode.currentTab)];
+                          } else {
+                            removeFleet(row, fleetMode.currentTab);
+                          }
+                          control.savePlayer();
+                        } else {
+                          commander.fleet.selection = {
+                            row: row,
+                            tab: fleetMode.currentTab,
+                          };
+                          account.save();
+                          fleetMode.draggingFleet = {
+                            row: row,
+                            tab: fleetMode.currentTab,
+                            name: fleetAis[getAIKey(row, fleetMode.currentTab)],
+                            copy: e.shiftKey,
+                          };
                         }
-                        delete commander.fleet.ais[getAIKey(row, fleetMode.currentTab)];
-                      } else {
-                        removeFleet(row, fleetMode.currentTab);
-                      }
-                      control.savePlayer();
-                    } else {
-                      commander.fleet.selection = {
-                        row: row,
-                        tab: fleetMode.currentTab
-                      };
-                      account.save();
-                      fleetMode.draggingFleet = {
-                        row: row,
-                        tab: fleetMode.currentTab,
-                        name: fleetAis[getAIKey(row, fleetMode.currentTab)],
-                        copy: e.shiftKey
-                      };
+                        return e.preventDefault();
+                      });
                     }
-                    return e.preventDefault();
-                  });
-                });
-                return input(".hover-black", {
-                  type: "text",
-                  value: fleetAis[getAIKey(row, fleetMode.currentTab)] || "",
-                  maxlength: 15,
-                  placeholder: "●"
-                }, function() {
-                  position("absolute");
-                  padding(10);
-                  top(20);
-                  left(-84);
-                  width(84);
-                  color("white");
-                  border("none");
-                  font_size(12);
-                  text_align("right");
-                  return oninput(function(e) {
-                    if (!commander.fleet.ais) {
-                      commander.fleet.ais = {};
+                  );
+                  return input(
+                    ".hover-black",
+                    {
+                      type: "text",
+                      value: fleetAis[getAIKey(row, fleetMode.currentTab)] || "",
+                      maxlength: 15,
+                      placeholder: "●",
+                    },
+                    function () {
+                      position("absolute");
+                      padding(10);
+                      top(20);
+                      left(-84);
+                      width(84);
+                      color("white");
+                      border("none");
+                      font_size(12);
+                      text_align("right");
+                      return oninput(function (e) {
+                        if (!commander.fleet.ais) {
+                          commander.fleet.ais = {};
+                        }
+                        fleetAis = commander.fleet.ais;
+                        e.target.value = e.target.value.replace(/[^A-Za-z0-9]/g, "");
+                        fleetAis[getAIKey(row, fleetMode.currentTab)] = e.target.value;
+                        return account.rootSave();
+                      });
                     }
-                    fleetAis = commander.fleet.ais;
-                    e.target.value = e.target.value.replace(/[^A-Za-z0-9]/g, "");
-                    fleetAis[getAIKey(row, fleetMode.currentTab)] = e.target.value;
-                    return account.rootSave();
-                  });
+                  );
                 });
               });
-            });
-          })(row));
+            })(row)
+          );
         }
         return results;
       });
     });
-    div("#unit-dragger", function() {
+    div("#unit-dragger", function () {
       position("absolute");
       width(84);
       height(84);
@@ -907,7 +955,7 @@
         return buildBar.specToThumbBg(fleetMode.draggingUnit.spec);
       }
     });
-    div("#fleet-dragger", function() {
+    div("#fleet-dragger", function () {
       var i, j, key, ref, row, tab;
       if (fleetMode.draggingFleet) {
         position("absolute");
@@ -920,7 +968,7 @@
         height(84);
         visibility("visible");
         pointer_events("none");
-        div(function() {
+        div(function () {
           var ref;
           text(((ref = fleetMode.draggingFleet) != null ? ref.name : void 0) || "●");
           position("absolute");
@@ -934,9 +982,9 @@
           return text_align("right");
         });
         for (i = j = 0; j < 10; i = ++j) {
-          ref = fleetMode.draggingFleet, row = ref.row, tab = ref.tab;
+          (ref = fleetMode.draggingFleet), (row = ref.row), (tab = ref.tab);
           key = getFleetKey(row, i, tab);
-          div(function() {
+          div(function () {
             position("absolute");
             width(84);
             height(84);
@@ -946,15 +994,19 @@
             return buildBar.specToThumbBg(commander.fleet[key]);
           });
         }
-        return img(".hover-fade", {
-          src: "img/ui/back.png",
-          width: 40,
-          height: 50
-        }, function() {
-          position("absolute");
-          top(15);
-          return right(-42);
-        });
+        return img(
+          ".hover-fade",
+          {
+            src: "img/ui/back.png",
+            width: 40,
+            height: 50,
+          },
+          function () {
+            position("absolute");
+            top(15);
+            return right(-42);
+          }
+        );
       } else {
         return visibility("hidden");
       }
@@ -964,8 +1016,8 @@
     }
   };
 
-  lockScreen = function() {
-    return div(function() {
+  lockScreen = function () {
+    return div(function () {
       position("absolute");
       top(0);
       left(0);
@@ -973,7 +1025,7 @@
       bottom(0);
       background_color("rgba(0,0,0,.8)");
       z_index("2");
-      return div(function() {
+      return div(function () {
         position("absolute");
         top(200);
         right(0);
@@ -988,10 +1040,10 @@
     });
   };
 
-  unitButton = function(key) {
+  unitButton = function (key) {
     var spec;
     spec = commander.fleet[key];
-    return div(".unitpic", function() {
+    return div(".unitpic", function () {
       var found, name, unit;
       border("1px solid rgba(255,255,255,.05)");
       display("inline-block");
@@ -1016,7 +1068,7 @@
           opacity(".1");
         }
       }
-      onmousedown(function(e) {
+      onmousedown(function (e) {
         if (e.which === 1) {
           if (e.altKey) {
             commander.fleet[key] = "";
@@ -1025,7 +1077,7 @@
           if (spec) {
             fleetMode.draggingUnit = {
               spec: spec,
-              key: key
+              key: key,
             };
             if (!e.shiftKey) {
               commander.fleet[key] = "";
@@ -1034,7 +1086,7 @@
         }
         return e.preventDefault();
       });
-      onmousemove(function(e) {
+      onmousemove(function (e) {
         if (e.which === 1) {
           if (fleetMode.unitDragover !== key) {
             fleetMode.unitDragover = key;
@@ -1045,7 +1097,7 @@
         }
         return onecup.no_refresh();
       });
-      return onmouseup(function(e) {
+      return onmouseup(function (e) {
         var atSpec;
         if (e.which === 1) {
           if (fleetMode.draggingUnit) {
@@ -1063,8 +1115,8 @@
     });
   };
 
-  ui.unitPix = function() {
-    return div(function() {
+  ui.unitPix = function () {
+    return div(function () {
       var j, results, row;
       position("absolute");
       top(0);
@@ -1075,34 +1127,34 @@
       text("unit pix");
       results = [];
       for (row = j = 1; j < 25; row = ++j) {
-        results.push(div(function() {
-          var col, key, l, results1, spec, unit;
-          height(84);
-          min_width(840);
-          results1 = [];
-          for (col = l = 0; l < 10; col = ++l) {
-            key = getFleetKey(row, col, fleetMode.currentTab);
-            spec = commander.fleet[key];
-            unit = buildBar.specToUnit(spec);
-            if (unit) {
-              unit.color = commander.color;
-              results1.push(img({
-                src: unit.thumb(),
-                width: 64,
-                height: 64
-              }));
-            } else {
-              results1.push(void 0);
+        results.push(
+          div(function () {
+            var col, key, l, results1, spec, unit;
+            height(84);
+            min_width(840);
+            results1 = [];
+            for (col = l = 0; l < 10; col = ++l) {
+              key = getFleetKey(row, col, fleetMode.currentTab);
+              spec = commander.fleet[key];
+              unit = buildBar.specToUnit(spec);
+              if (unit) {
+                unit.color = commander.color;
+                results1.push(
+                  img({
+                    src: unit.thumb(),
+                    width: 64,
+                    height: 64,
+                  })
+                );
+              } else {
+                results1.push(void 0);
+              }
             }
-          }
-          return results1;
-        }));
+            return results1;
+          })
+        );
       }
       return results;
     });
   };
-
-}).call(this);
-;
-
-
+}.call(this));

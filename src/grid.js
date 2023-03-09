@@ -55,14 +55,6 @@
         if (!(part.dir === 0 || part.canRotate)) {
           issues.push("Part cannot rotate");
         }
-        if (!player.ai) {
-          if (!(typeof account !== "undefined" && account !== null ? account.hasDLC(part.dlc) : void 0)) {
-            issues.push("Please support us by getting " + part.dlc + " DLC and unlock " + part.name + ".");
-          }
-          if (!(typeof account !== "undefined" && account !== null ? account.hasDLCBonus() : void 0) && part.dir && part.dir !== 0) {
-            issues.push("Part rotation is currently only available to <a href='http://store.steampowered.com/app/472490' target='_blank'>supporters who get a DLC</a>.");
-          }
-        }
       }
       hasPart = function (name) {
         var k, len1, ref1;
@@ -331,18 +323,6 @@
           if (t === void 0) {
             badParts.push(part);
             continue;
-          }
-          if (!player.ai) {
-            if (part.dlc) {
-              if (!account.hasDLC(part.dlc)) {
-                t.bad = true;
-                t.locked = true;
-              }
-            }
-            if (!account.hasDLCBonus() && part.dir && part.dir !== 0) {
-              t.bad = true;
-              t.locked = true;
-            }
           }
           if (sim.galaxyStar && player.id === commander.id && !galaxyMode.unlockedParts[part.constructor.name]) {
             t.bad = true;

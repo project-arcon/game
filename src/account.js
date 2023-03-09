@@ -41,9 +41,6 @@
         }
       }
     }
-    if (typeof require !== "undefined" && require !== null) {
-      return account.loadDLC();
-    }
   };
 
   account.connectedToRoot = function () {
@@ -486,9 +483,6 @@
   account.hashPass = function (pass) {
     return sha1("fhs2:" + account.email + ":" + pass);
   };
-
-  account.hasDLC = () => true;
-  account.hasDLCBonus = () => true;
 
   css(".bigtab", function () {
     display("inline-block");

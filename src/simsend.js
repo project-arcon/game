@@ -29,10 +29,8 @@
       len4,
       len5,
       len6,
-      len7,
       m,
       o,
-      p,
       packet,
       part,
       partId,
@@ -49,11 +47,9 @@
       s,
       splayers,
       sthings,
-      t,
       thing,
       v,
-      x,
-      y;
+      x;
     sim.timeStart("send");
     sim.timeStart("things");
     sthings = [];
@@ -199,18 +195,14 @@
     sim.timeEnd("players");
     sim.timeStart("other");
     data = {};
-    s = sim.net;
-    if (!s) {
-      sim.net = s = {};
-    }
+    s = sim.net || {};
     sim_fields = sim.simFields;
-    for (y = 0, len7 = sim_fields.length; y < len7; y++) {
-      f = sim_fields[y];
+    sim_fields.forEach((f) => {
       if (!simpleEquals(s[f], sim[f])) {
         data[f] = sim[f];
         s[f] = sim[f];
       }
-    }
+    });
     if (splayers.length > 0) {
       data.players = splayers;
     }
@@ -224,62 +216,13 @@
     if (sim.step % 16 === 0) {
       data.perf = {
         numbers: {
-          things: function () {
-            var results;
-            results = [];
-            for (t in sim.things) {
-              results.push(t);
-            }
-            return results;
-          }.call(sim).length,
+          things: Object.keys(sim.things).length,
           sthings: sthings.length,
-          players: function () {
-            var i1, len9, ref14, results;
-            ref14 = sim.players;
-            results = [];
-            for (i1 = 0, len9 = ref14.length; i1 < len9; i1++) {
-              p = ref14[i1];
-              results.push(p);
-            }
-            return results;
-          }.call(sim).length,
+          players: sim.players.length,
           splayers: splayers.length,
-          units: function () {
-            var ref14, results;
-            ref14 = sim.things;
-            results = [];
-            for (_ in ref14) {
-              t = ref14[_];
-              if (t.unit) {
-                results.push(t);
-              }
-            }
-            return results;
-          }.call(sim).length,
-          bullets: function () {
-            var ref14, results;
-            ref14 = sim.things;
-            results = [];
-            for (_ in ref14) {
-              t = ref14[_];
-              if (t.bullet) {
-                results.push(t);
-              }
-            }
-            return results;
-          }.call(sim).length,
-          others: function () {
-            var ref14, results;
-            ref14 = sim.things;
-            results = [];
-            for (_ in ref14) {
-              t = ref14[_];
-              if (!t.bullet && !t.unit) {
-                results.push(t);
-              }
-            }
-            return results;
-          }.call(sim).length,
+          units: Object.values(sim.things).filter((t) => t.unit).length,
+          bullets: Object.values(sim.things).filter((t) => t.bullet).length,
+          others: Object.values(sim.things).filter((t) => !t.bullet && !t.unit).length,
         },
         timeings: sim.timeings,
       };

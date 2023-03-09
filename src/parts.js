@@ -733,8 +733,6 @@
 
     HArmor2x2Curved.prototype.size = [2, 2];
 
-    HArmor2x2Curved.prototype.dlc = "Curves and Shadows";
-
     return HArmor2x2Curved;
   })(HArmor);
 
@@ -784,8 +782,6 @@
     function ShadowArmor() {
       return ShadowArmor.__super__.constructor.apply(this, arguments);
     }
-
-    ShadowArmor.prototype.dlc = "Curves and Shadows";
 
     ShadowArmor.prototype.northWest = true;
 
@@ -1193,8 +1189,6 @@
 
     UArmor1x2Notch1.prototype.mass = 2;
 
-    UArmor1x2Notch1.prototype.dlc = "Curves and Shadows";
-
     return UArmor1x2Notch1;
   })(UArmor);
 
@@ -1214,8 +1208,6 @@
     UArmor1x2Notch2.prototype.size = [1, 2];
 
     UArmor1x2Notch2.prototype.mass = 2;
-
-    UArmor1x2Notch2.prototype.dlc = "Curves and Shadows";
 
     return UArmor1x2Notch2;
   })(UArmor);
@@ -1237,8 +1229,6 @@
 
     UArmor1x1Notch1.prototype.mass = 1;
 
-    UArmor1x1Notch1.prototype.dlc = "Curves and Shadows";
-
     return UArmor1x1Notch1;
   })(UArmor);
 
@@ -1259,8 +1249,6 @@
 
     UArmor1x1Notch2.prototype.mass = 1;
 
-    UArmor1x1Notch2.prototype.dlc = "Curves and Shadows";
-
     return UArmor1x1Notch2;
   })(UArmor);
 
@@ -1280,8 +1268,6 @@
     UArmor1x1Spike.prototype.size = [1, 1];
 
     UArmor1x1Spike.prototype.mass = 0.5;
-
-    UArmor1x1Spike.prototype.dlc = "Curves and Shadows";
 
     return UArmor1x1Spike;
   })(UArmor);
@@ -1623,8 +1609,6 @@
 
     VArmor2x2Curve.prototype.mass = 6;
 
-    VArmor2x2Curve.prototype.dlc = "Curves and Shadows";
-
     return VArmor2x2Curve;
   })(VArmor);
 
@@ -1644,8 +1628,6 @@
     VArmor1x1Curve.prototype.size = [1, 1];
 
     VArmor1x1Curve.prototype.mass = 1.5;
-
-    VArmor1x1Curve.prototype.dlc = "Curves and Shadows";
 
     return VArmor1x1Curve;
   })(VArmor);
@@ -1667,8 +1649,6 @@
 
     VArmor2x1Curved.prototype.mass = 3;
 
-    VArmor2x1Curved.prototype.dlc = "Curves and Shadows";
-
     return VArmor2x1Curved;
   })(VArmor);
 
@@ -1688,8 +1668,6 @@
     VArmor1x2Curved.prototype.size = [1, 2];
 
     VArmor1x2Curved.prototype.mass = 3;
-
-    VArmor1x2Curved.prototype.dlc = "Curves and Shadows";
 
     return VArmor1x2Curved;
   })(VArmor);
@@ -1711,8 +1689,6 @@
 
     VArmor2x2Curved.prototype.mass = 6;
 
-    VArmor2x2Curved.prototype.dlc = "Curves and Shadows";
-
     return VArmor2x2Curved;
   })(VArmor);
 
@@ -1724,8 +1700,6 @@
     }
 
     VShadowArmor.prototype.name = "Volumetric Shadow Armor";
-
-    VShadowArmor.prototype.dlc = "Curves and Shadows";
 
     VShadowArmor.prototype.northWest = true;
 
@@ -6282,8 +6256,6 @@
 
     SymbolDecal1.prototype.tab = "decal";
 
-    SymbolDecal1.prototype.dlc = "Paint Job";
-
     SymbolDecal1.prototype.opacity = 1;
 
     return SymbolDecal1;
@@ -6926,8 +6898,6 @@
 
     Stripe1x1Slash.prototype.image = "decals/Stripe1x1Slash.png";
 
-    Stripe1x1Slash.prototype.dlc = "Curves and Shadows";
-
     return Stripe1x1Slash;
   })(parts.Stripe1x1);
 
@@ -6941,8 +6911,6 @@
     Stripe1x1SlashInside.prototype.size = [1, 1];
 
     Stripe1x1SlashInside.prototype.image = "decals/Stripe1x1SlashInside.png";
-
-    Stripe1x1SlashInside.prototype.dlc = "Curves and Shadows";
 
     return Stripe1x1SlashInside;
   })(parts.Stripe1x1);
@@ -6958,8 +6926,6 @@
 
     Stripe2x2Slash.prototype.image = "decals/Stripe2x2Slash.png";
 
-    Stripe2x2Slash.prototype.dlc = "Curves and Shadows";
-
     return Stripe2x2Slash;
   })(parts.Stripe1x1);
 
@@ -6973,8 +6939,6 @@
     Stripe2x2End.prototype.size = [2, 2];
 
     Stripe2x2End.prototype.image = "decals/Stripe2x2End.png";
-
-    Stripe2x2End.prototype.dlc = "Curves and Shadows";
 
     return Stripe2x2End;
   })(parts.Stripe1x1);
@@ -6990,8 +6954,6 @@
 
     Stripe1x1Fill1.prototype.image = "decals/Stripe1x1Fill1.png";
 
-    Stripe1x1Fill1.prototype.dlc = "Curves and Shadows";
-
     return Stripe1x1Fill1;
   })(parts.Stripe1x1);
 
@@ -7005,8 +6967,6 @@
     Stripe1x1Fill2.prototype.size = [1, 1];
 
     Stripe1x1Fill2.prototype.image = "decals/Stripe1x1Fill2.png";
-
-    Stripe1x1Fill2.prototype.dlc = "Curves and Shadows";
 
     return Stripe1x1Fill2;
   })(parts.Stripe1x1);
@@ -7022,8 +6982,6 @@
 
     Stripe1x1Fill3.prototype.image = "decals/Stripe1x1Fill3.png";
 
-    Stripe1x1Fill3.prototype.dlc = "Curves and Shadows";
-
     return Stripe1x1Fill3;
   })(parts.Stripe1x1);
 
@@ -7037,8 +6995,6 @@
     Stripe1x1Fill4.prototype.size = [1, 1];
 
     Stripe1x1Fill4.prototype.image = "decals/Stripe1x1Fill4.png";
-
-    Stripe1x1Fill4.prototype.dlc = "Curves and Shadows";
 
     return Stripe1x1Fill4;
   })(parts.Stripe1x1);
@@ -7054,8 +7010,6 @@
 
     Stripe1x1Fill5.prototype.image = "decals/Stripe1x1Fill5.png";
 
-    Stripe1x1Fill5.prototype.dlc = "Curves and Shadows";
-
     return Stripe1x1Fill5;
   })(parts.Stripe1x1);
 
@@ -7069,8 +7023,6 @@
     Stripe1x1Fill6.prototype.size = [1, 1];
 
     Stripe1x1Fill6.prototype.image = "decals/Stripe1x1Fill6.png";
-
-    Stripe1x1Fill6.prototype.dlc = "Curves and Shadows";
 
     return Stripe1x1Fill6;
   })(parts.Stripe1x1);
