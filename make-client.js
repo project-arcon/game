@@ -55,6 +55,8 @@ const files = [
   "./src/vparts.js",
   "./src/arcon.js",
   "./atlases/atlas.js",
+
+  "./src/part_history.js",
 ];
 
 // Read and concatenate the contents of all the files

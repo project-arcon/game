@@ -151,12 +151,22 @@
 
     Sim.prototype.nGamesPlayed = 0;
 
-    Sim.prototype.validTypes = {
-      sandbox: "sandbox",
-      "1v1": "1v1",
-      "2v2": "2v2",
-      "3v3": "3v3",
-      survival: "survival",
+    Sim.prototype.game_modes = {
+      survival: {
+        players_required_per_team: 0,
+      },
+      sandbox: {
+        players_required_per_team: 0,
+      },
+      "1v1": {
+        players_required_per_team: 1,
+      },
+      "2v2": {
+        players_required_per_team: 2,
+      },
+      "3v3": {
+        players_required_per_team: 3,
+      },
     };
 
     Sim.prototype.say = function (message, rootName) {
@@ -299,7 +309,7 @@
           }
         }
       }
-      if (!this.validTypes[config.type]) {
+      if (!this.game_modes[config.type]) {
         print("Config type is not valid");
         return;
       }
@@ -313,16 +323,7 @@
     };
 
     Sim.prototype.playersPerTeam = function () {
-      if (this.serverType.slice(0, 3) === "1v1") {
-        return 1;
-      }
-      if (this.serverType === "2v2") {
-        return 2;
-      }
-      if (this.serverType === "3v3") {
-        return 3;
-      }
-      return 3;
+      return this.game_modes[this.serverType].players_required_per_team || 3;
     };
 
     Sim.prototype.generateMap = function (mapScale, numComPoints, mapSeed) {
@@ -591,55 +592,45 @@
       return results;
     };
 
-    Sim.prototype.startGame = function (player, real) {
-      if (real == null) {
-        real = false;
-      }
+    // vax
+    Sim.prototype.startGame = function (player, real = false) {
       if (this.local) {
-        /*if (this.numInTeam("alpha") === 0 || this.numInTeam("beta") === 0) {
-          this.say("Warning: One team has no players. You should add an AI to that team.");
-        }*/
-        this.start();
-        return;
+        return this.start();
       }
+
       if (!player.host) {
-        print("A non-host player is trying to start game.");
+        console.log("A non-host player is trying to start the game.");
         return;
       }
+
       if (this.state !== "waiting") {
-        print("Trying to start a game when a game is already in progress. State:", this.state);
+        console.log("Trying to start a game when a game is already in progress. State:", this.state);
         return;
       }
+
       if (!this.canStart(true)) {
         return;
       }
+
       this.sayToServer("sim.starting_game");
+
       return (this.countDown = this.serverType === "sandbox" ? 1 : 16 * 6);
     };
 
-    Sim.prototype.canStart = function (sayStyff) {
-      if (sayStyff == null) {
-        sayStyff = false;
-      }
-      if (this.serverType === "survival") {
-        return survival.canStart(this);
-      }
-      if (this.serverType === "sandbox") {
+    // vax
+    Sim.prototype.canStart = function (sayStyff = false) {
+      if (this.serverType === "survival") return survival.canStart(this);
+      if (this.serverType === "sandbox") return true;
+
+      const checkTeam = (team) => {
+        if (this.numInTeam(team) !== this.playersPerTeam()) {
+          if (sayStyff) this.sayToServer("sim.starting_rejected.team_missing_players", team);
+          return false;
+        }
         return true;
-      }
-      if (this.numInTeam("alpha") !== this.playersPerTeam()) {
-        if (sayStyff) {
-          this.sayToServer("sim.starting_rejected.team_missing_players", "alpha");
-        }
-        return false;
-      }
-      if (this.numInTeam("beta") !== this.playersPerTeam()) {
-        if (sayStyff) {
-          this.sayToServer("sim.starting_rejected.team_missing_players", "beta");
-        }
-        return false;
-      }
-      return true;
+      };
+
+      return checkTeam("alpha") && checkTeam("beta");
     };
 
     Sim.prototype.validateBuildBar = function (player) {

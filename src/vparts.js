@@ -123,6 +123,7 @@ const vturrets = {
   //FlameTurret: "turFlame.png"
 };
 
+/*
 for (const i in vblocks) {
   const vpart = vblocks[i];
   const part = parts[i];
@@ -141,6 +142,7 @@ for (const i in vturrets) {
   part.prototype.vscale = vpart.vscale;
   part.prototype.vturret = true;
 }
+*/
 
 Part.prototype.draw = function () {
   var alpha, angle, c, flip, id, num, numParts, rot, showDamage, t;

@@ -15,41 +15,7 @@
   };
 
   window.sendSim = function (sim) {
-    var _,
-      changes,
-      data,
-      e,
-      f,
-      i,
-      id,
-      l,
-      len1,
-      len2,
-      len3,
-      len4,
-      len5,
-      len6,
-      m,
-      o,
-      packet,
-      part,
-      partId,
-      player,
-      predictable,
-      q,
-      r,
-      things,
-      thing_fields,
-      players,
-      player_fields,
-      sim_fields,
-      parts,
-      s,
-      splayers,
-      sthings,
-      thing,
-      v,
-      x;
+    var _, changes, data, e, f, i, id, l, m, o, packet, part, partId, player, predictable, q, r, things, thing_fields, players, player_fields, sim_fields, parts, s, splayers, sthings, thing, v, x;
     sim.timeStart("send");
     sim.timeStart("things");
     sthings = [];
@@ -70,7 +36,7 @@
         s = thing.net;
       }
       thing_fields = sim.thingFields;
-      for (l = 0, len1 = thing_fields.length; l < len1; l++) {
+      for (l = 0, thing_fields.length; l < thing_fields.length; l++) {
         f = thing_fields[l];
         v = thing[f];
         if (v != null && !simpleEquals(s[f], v)) {
@@ -78,7 +44,7 @@
             if (s.length !== v.length) {
               s[f] = new Array(v.length);
             }
-            for (i = m = 0, len2 = v.length; m < len2; i = ++m) {
+            for (i = m = 0, v.length; m < v.length; i = ++m) {
               e = v[i];
               s[f][i] = e;
             }
@@ -129,7 +95,7 @@
       }
       if (thing.parts != null) {
         parts = thing.parts;
-        for (partId = o = 0, len3 = parts.length; o < len3; partId = ++o) {
+        for (partId = o = 0, parts.length; o < parts.length; partId = ++o) {
           part = parts[partId];
           changes.push(["partId", partId]);
           s = part.net;
@@ -160,7 +126,7 @@
     sim.timeStart("players");
     splayers = [];
     players = sim.players;
-    for (q = 0, len4 = players.length; q < len4; q++) {
+    for (q = 0, players.length; q < players.length; q++) {
       player = players[q];
       changes = [];
       changes.push(["playerNumber", player.number]);
@@ -170,7 +136,7 @@
         s = player.net;
       }
       player_fields = sim.playerFields;
-      for (r = 0, len5 = player_fields.length; r < len5; r++) {
+      for (r = 0, player_fields.length; r < player_fields.length; r++) {
         f = player_fields[r];
         v = player[f];
         if (v != null && !simpleEquals(s[f], v)) {
@@ -178,7 +144,7 @@
             if (s.length !== v.length) {
               s[f] = new Array(v.length);
             }
-            for (i = x = 0, len6 = v.length; x < len6; i = ++x) {
+            for (i = x = 0, v.length; x < v.length; i = ++x) {
               e = v[i];
               s[f][i] = e;
             }
