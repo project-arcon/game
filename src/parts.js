@@ -5192,7 +5192,7 @@
         unit.applyDamage(this.damage);
         this.hitOnce[unit.id] = true;
       }
-      var mode = "mass_versus";
+      var mode = "normal";
       switch (mode) {
         case "mass_versus":
           var p1 = this.origin.mass / (unit.mass + this.origin.mass);
