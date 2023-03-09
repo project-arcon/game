@@ -182,13 +182,62 @@
     if (sim.step % 16 === 0) {
       data.perf = {
         numbers: {
-          things: Object.keys(sim.things).length,
+          things: function () {
+            var results;
+            results = [];
+            for (t in sim.things) {
+              results.push(t);
+            }
+            return results;
+          }.call(sim).length,
           sthings: sthings.length,
-          players: sim.players.length,
+          players: function () {
+            var i1, len9, ref14, results;
+            ref14 = sim.players;
+            results = [];
+            for (i1 = 0, len9 = ref14.length; i1 < len9; i1++) {
+              p = ref14[i1];
+              results.push(p);
+            }
+            return results;
+          }.call(sim).length,
           splayers: splayers.length,
-          units: Object.values(sim.things).filter((t) => t.unit).length,
-          bullets: Object.values(sim.things).filter((t) => t.bullet).length,
-          others: Object.values(sim.things).filter((t) => !t.bullet && !t.unit).length,
+          units: function () {
+            var ref14, results;
+            ref14 = sim.things;
+            results = [];
+            for (_ in ref14) {
+              t = ref14[_];
+              if (t.unit) {
+                results.push(t);
+              }
+            }
+            return results;
+          }.call(sim).length,
+          bullets: function () {
+            var ref14, results;
+            ref14 = sim.things;
+            results = [];
+            for (_ in ref14) {
+              t = ref14[_];
+              if (t.bullet) {
+                results.push(t);
+              }
+            }
+            return results;
+          }.call(sim).length,
+          others: function () {
+            var ref14, results;
+            ref14 = sim.things;
+            results = [];
+            for (_ in ref14) {
+              t = ref14[_];
+              if (!t.bullet && !t.unit) {
+                results.push(t);
+              }
+            }
+            return results;
+          }.call(sim).length,
         },
         timeings: sim.timeings,
       };

@@ -45,10 +45,7 @@ function reset_history() {
 document.addEventListener("mouseup", function (e) {
   if (e.button !== 0) return;
   if (ui.mode == "design") {
-    if (last_selected_fleet !== commander.fleet.selection) {
-      reset_history();
-    }
-    if (last_selected_unit !== buildBar.selected) {
+    if (last_selected_fleet !== commander.fleet.selection || last_selected_unit !== buildBar.selected) {
       reset_history();
     } else {
       update_history();
