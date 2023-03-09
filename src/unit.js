@@ -341,6 +341,55 @@
       }
     };
 
+    var partOccupiedGrid = function (part) {
+      var xsize, ysize;
+      var result = [];
+      if (part.dir % 2 === 0) {
+        xsize = part.size[0];
+        ysize = part.size[1];
+      } else {
+        xsize = part.size[1];
+        ysize = part.size[0];
+      }
+      var basex = part.pos[0] - ((xsize - 1) / 2) * 20;
+      var basey = part.pos[1] - ((ysize - 1) / 2) * 20;
+      for (var x = 0; x < xsize; x++) {
+        for (var y = 0; y < ysize; y++) {
+          result.push([basex + x * 20, basey + y * 20]);
+        }
+      }
+      return result;
+    };
+
+    var partCorners = function (part) {
+      var xsize, ysize;
+      var result = [];
+      if (part.dir % 2 === 0) {
+        xsize = part.size[0];
+        ysize = part.size[1];
+      } else {
+        xsize = part.size[1];
+        ysize = part.size[0];
+      }
+      var xmin = part.pos[0] - ((xsize - 1) / 2) * 20;
+      var ymin = part.pos[1] - ((ysize - 1) / 2) * 20;
+      var xmax = xmin + (xsize - 1) * 20;
+      var ymax = ymin + (ysize - 1) * 20;
+
+      result.push([xmin, ymin]);
+      if (xmin !== xmax) {
+        result.push([xmax, ymin]);
+      }
+      if (ymin !== ymax) {
+        result.push([xmin, ymax]);
+      }
+      if (xmin !== xmax && ymin !== ymax) {
+        result.push([xmax, ymax]);
+      }
+
+      return result;
+    };
+
     Unit.prototype.computeRadius = function () {
       var j, len, part, radius, ref, v;
       v = v2.create();
@@ -350,15 +399,17 @@
         if (!!part.decal) {
           continue;
         }
-        v2.set(part.pos, v);
-        v2.sub(v, this.center);
-        radius = v2.mag(v);
-        if (radius > this.radius) {
-          this.radius = radius;
+        //var grids = partCorners(part);
+        var grids = [part.pos];
+        for (let i = 0; i < grids.length; i++) {
+          const pos = grids[i];
+          v2.set(pos, v);
+          v2.sub(v, this.center);
+          radius = v2.mag(v);
+          if (radius > this.radius) {
+            this.radius = radius;
+          }
         }
-      }
-      if (this.radius > 500) {
-        return (this.radius = 500);
       }
     };
 

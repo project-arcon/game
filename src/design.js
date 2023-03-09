@@ -80,6 +80,8 @@
 
     DesignMode.prototype.manualLocked = false;
 
+    DesignMode.prototype.disableBadPartsFlash = false;
+
     DesignMode.prototype.advanced_build_tool = false;
 
     function DesignMode() {
@@ -262,7 +264,7 @@
         return;
       }
       if (this.draggingPart) {
-        if (this.outsidePartsPlacement || (Math.abs(this.pos[0]) < NxN * SIZE && Math.abs(this.pos[1]) < NxN * SIZE)) {
+        if (this.outsidePartsPlacement || (Math.abs(this.pos[0]) < NxN * SIZE * 0.5 && Math.abs(this.pos[1]) < NxN * SIZE * 0.5)) {
           placePart = (function (_this) {
             return function (part) {
               var p, ref;
@@ -420,7 +422,7 @@
           row = ref1[x];
           for (y = m = 0, len2 = row.length; m < len2; y = ++m) {
             t = row[y];
-            if (t.bad && !this.hideHoverInfo) {
+            if (t.bad && !this.hideHoverInfo && !this.disableBadPartsFlash) {
               color = [255, 0, 0, 80 + Math.sin(Date.now() / 300) * 80];
             } else if (t.exhaust) {
               color = [255, 255, 255, 65];
@@ -1328,6 +1330,14 @@
           return (designMode.hideHoverInfo = !designMode.hideHoverInfo);
         });
       });
+      /*editorButton("img/ui/topbar/chat.png", "Disable bad parts flash", function () {
+        if (designMode.disableBadPartsFlash) {
+          background(hasIssue(commander, designMode.unit.spec) ? "rgba(255,0,0,.2)" : "rgba(0,0,0,.2)");
+        }
+        return onclick(function () {
+          return (designMode.disableBadPartsFlash = !designMode.disableBadPartsFlash);
+        });
+      });*/
       editorButton("img/ui/aiRules.png", "AI editor", function () {
         if (designMode.aiEdit) {
           background("rgba(0,0,0,.2)");
@@ -1391,17 +1401,17 @@
           return (designMode.showShareBox = !designMode.showShareBox);
         });
       });
-      if (designMode.advanced_build_tool) {
-        editorButton("img/ui/share.png", "Raw spec (JSON)", function () {
-          if (designMode.showShareBoxJson) {
-            background("rgba(0,0,0,.2)");
-          }
-          return onclick(function () {
-            designMode.showShareBox = false;
-            designMode.aiEdit = false;
-            return (designMode.showShareBoxJson = !designMode.showShareBoxJson);
-          });
+      editorButton("img/ui/share.png", "Raw spec (JSON)", function () {
+        if (designMode.showShareBoxJson) {
+          background("rgba(0,0,0,.2)");
+        }
+        return onclick(function () {
+          designMode.showShareBox = false;
+          designMode.aiEdit = false;
+          return (designMode.showShareBoxJson = !designMode.showShareBoxJson);
         });
+      });
+      if (designMode.advanced_build_tool) {
         editorButton("img/ui/delete.png", "Lock", function () {
           if (designMode.manualLocked) {
             background("rgba(255,0,0,.2)");

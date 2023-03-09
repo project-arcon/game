@@ -1340,6 +1340,7 @@
       return;
     }
     if (rules.length) {
+      unit.closestCache = undefined;
       results = [];
       for (l = 0, len1 = rules.length; l < len1; l++) {
         rule = rules[l];
@@ -1357,6 +1358,7 @@
       }
       return results;
     }
+    unit.closestCache = undefined;
   };
 
   doUnitRules = function (unit, rule, player) {
