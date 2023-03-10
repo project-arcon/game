@@ -1063,14 +1063,9 @@
       this.startingSim();
       this.checkAfkPlayers();
       this.whoIsHost();
-      this.timeIt(
-        "spacesRebuild",
-        (function (_this) {
-          return function () {
-            return _this.spacesRebuild();
-          };
-        })(this)
-      );
+      this.timeStart("spacesRebuild");
+      this.spacesRebuild();
+      this.timeEnd("spacesRebuild");
       this.units = [
         function () {
           var ref, results;
@@ -1153,14 +1148,9 @@
         }
       }
       this.timeEnd("thingPostTick");
-      this.timeIt(
-        "unitsCollide",
-        (function (_this) {
-          return function () {
-            return _this.unitsCollide();
-          };
-        })(this)
-      );
+      this.timeStart("unitsCollide");
+      this.unitsCollide();
+      this.timeEnd("unitsCollide");
       if (this.state === "running" || this.serverType === "sandbox") {
         this.timeStart("playersTick");
         ref3 = this.players;
