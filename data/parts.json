@@ -2895,7 +2895,7 @@
     "layer": "decal"
   },
   {
-    "id": "arcon:faction_insignia_1",
+    "id": "arcon:faction_insignia_dev",
     "cost": 1,
     "hp": 4,
     "mass": 1,
@@ -2904,7 +2904,7 @@
     "disabled": true
   },
   {
-    "id": "arcon:faction_insignia_2",
+    "id": "arcon:faction_insignia_mod",
     "cost": 1,
     "hp": 4,
     "mass": 1,
@@ -2913,7 +2913,7 @@
     "disabled": true
   },
   {
-    "id": "arcon:faction_insignia_3",
+    "id": "arcon:faction_insignia_kc",
     "cost": 1,
     "hp": 4,
     "mass": 1,
@@ -2922,7 +2922,7 @@
     "disabled": true
   },
   {
-    "id": "arcon:faction_insignia_4",
+    "id": "arcon:faction_insignia_auto",
     "cost": 1,
     "hp": 4,
     "mass": 1,
@@ -2931,7 +2931,7 @@
     "disabled": true
   },
   {
-    "id": "arcon:faction_insignia_5",
+    "id": "arcon:faction_insignia_sieg",
     "cost": 1,
     "hp": 4,
     "mass": 1,
@@ -2940,7 +2940,7 @@
     "disabled": true
   },
   {
-    "id": "arcon:faction_insignia_6",
+    "id": "arcon:faction_insignia_isoi",
     "cost": 1,
     "hp": 4,
     "mass": 1,
@@ -2949,7 +2949,7 @@
     "disabled": true
   },
   {
-    "id": "arcon:faction_insignia_7",
+    "id": "arcon:faction_insignia_tkka",
     "cost": 1,
     "hp": 4,
     "mass": 1,
