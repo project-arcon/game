@@ -114,30 +114,27 @@
     };
 
     PartV2.prototype.tick = function () {
-      for (const comp_type in this.comps) {
-        const comp = this.comps[comp_type];
+      this.RunAllComp((comp) => {
         if (typeof comp.tick === "function") {
           comp.tick();
         }
-      }
+      });
     };
 
     PartV2.prototype.postTick = function () {
-      for (const comp_type in this.comps) {
-        const comp = this.comps[comp_type];
+      this.RunAllComp((comp) => {
         if (typeof comp.postTick === "function") {
           comp.postTick();
         }
-      }
+      });
     };
 
     PartV2.prototype.postDeath = function () {
-      for (const comp_type in this.comps) {
-        const comp = this.comps[comp_type];
+      this.RunAllComp((comp) => {
         if (typeof comp.postDeath === "function") {
           comp.postDeath();
         }
-      }
+      });
     };
 
     PartV2.prototype.draw = function () {
